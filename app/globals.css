@@ -4,6 +4,29 @@
 
 @layer base {
   :root {
+    --background: 40 30% 97%;
+    --foreground: 28 18% 12%;
+    --card: 40 28% 99%;
+    --card-foreground: 28 18% 12%;
+    --muted: 36 16% 92%;
+    --muted-foreground: 28 10% 40%;
+    --border: 34 14% 86%;
+    --input: 34 14% 86%;
+    --ring: 38 48% 44%;
+    --primary: 32 42% 38%;
+    --primary-foreground: 40 30% 98%;
+    --secondary: 38 22% 94%;
+    --secondary-foreground: 28 18% 14%;
+    --accent: 38 24% 90%;
+    --accent-foreground: 28 18% 14%;
+    --destructive: 0 62% 44%;
+    --destructive-foreground: 40 20% 98%;
+    --surface: 40 30% 98%;
+    --surface-elevated: 38 22% 94%;
+    --radius: 0.65rem;
+  }
+
+  .dark {
     --background: 30 10% 6%;
     --foreground: 40 18% 94%;
     --card: 28 11% 9%;
@@ -23,7 +46,6 @@
     --destructive-foreground: 40 20% 96%;
     --surface: 28 10% 7%;
     --surface-elevated: 270 8% 12%;
-    --radius: 0.65rem;
   }
 
   * {
@@ -45,6 +67,15 @@
     background-color: hsl(var(--background));
     background-image: linear-gradient(
       180deg,
+      hsl(40 32% 98%) 0%,
+      hsl(40 28% 96%) 55%,
+      hsl(38 22% 93%) 100%
+    );
+  }
+
+  .dark body {
+    background-image: linear-gradient(
+      180deg,
       hsl(28 11% 8%) 0%,
       hsl(30 10% 6%) 55%,
       hsl(32 9% 5%) 100%
@@ -52,8 +83,8 @@
   }
 
   ::selection {
-    background: hsl(38 38% 52% / 0.3);
-    color: hsl(40 20% 96%);
+    background: hsl(var(--primary) / 0.25);
+    color: hsl(var(--foreground));
   }
 }
 

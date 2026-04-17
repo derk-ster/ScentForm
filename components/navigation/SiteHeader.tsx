@@ -18,6 +18,7 @@ import {
 import { megaCollections, megaConcentrations } from "./nav-data";
 import { useCartStore } from "@/store/cart-store";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader() {
   const [solid, setSolid] = useState(false);
@@ -193,6 +194,7 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex flex-1 items-center justify-end gap-1 sm:gap-2 lg:flex-none">
+            <ThemeToggle />
             <Button
               type="button"
               variant="ghost"
@@ -251,15 +253,18 @@ export function SiteHeader() {
             >
               <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
                 <span className="text-sm font-medium">Menu</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Close menu"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <X className="h-5 w-5" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  <ThemeToggle />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Close menu"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto px-3 py-3 text-sm">
                 <details className="group border-b border-border/40 py-2">
