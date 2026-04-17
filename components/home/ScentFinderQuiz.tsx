@@ -192,7 +192,7 @@ export function ScentFinderQuiz() {
               Five taps. One scent.
             </h2>
             <p className="mt-3 text-sm text-muted-foreground">
-              Tell us your mood, budget, and when you'll wear it — we'll match
+              Tell us your mood, budget, and when you&apos;ll wear it — we&apos;ll match
               you with a fragrance from the catalog.
             </p>
           </div>

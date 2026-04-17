@@ -12,7 +12,7 @@ export default function ContactPage() {
       <h1 className="font-display text-4xl">Contact</h1>
       <p className="mt-3 text-sm text-muted-foreground">
         Questions about an order, a product, or a partnership? Send a note and
-        we'll get back within one business day.
+        we&apos;ll get back within one business day.
       </p>
       <ContactForm />
     </div>

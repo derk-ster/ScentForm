@@ -170,7 +170,7 @@ export function ConcentrationMatcher() {
             Find your concentration
           </h2>
           <p className="mt-3 text-sm text-muted-foreground">
-            EDT, EDP, Extrait, or oil? Answer four quick questions and we'll
+            EDT, EDP, Extrait, or oil? Answer four quick questions and we&apos;ll
             steer you to the right strength — so a scent you love fits the way
             you actually wear it.
           </p>
