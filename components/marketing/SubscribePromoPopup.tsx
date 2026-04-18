@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils/cn";
 import { useCartStore } from "@/store/cart-store";
+import { usePromoTeaserVisibility } from "@/components/marketing/PromoTeaserVisibility";
 
 const CLAIMED_KEY = "scentform-subscribe-10-off-claimed";
 const CLOSE_FOREVER_KEY = "scentform-promo-close-forever";
@@ -138,6 +139,32 @@ export function SubscribePromoPopup() {
     setDialogOpen(false);
     setTeaserSessionDismissed(false);
   };
+
+  const showBottomPromoTeaser = React.useMemo(
+    () =>
+      hydrated &&
+      !claimed &&
+      minimized &&
+      !dialogOpen &&
+      !(teaserSessionDismissed && !dialogOpen && !minimized) &&
+      !(closeForeverPref && !inPayFunnel && !dialogOpen && !minimized),
+    [
+      hydrated,
+      claimed,
+      minimized,
+      dialogOpen,
+      teaserSessionDismissed,
+      closeForeverPref,
+      inPayFunnel,
+    ],
+  );
+
+  const { setPromoTeaserVisible } = usePromoTeaserVisibility();
+
+  React.useEffect(() => {
+    setPromoTeaserVisible(showBottomPromoTeaser);
+    return () => setPromoTeaserVisible(false);
+  }, [showBottomPromoTeaser, setPromoTeaserVisible]);
 
   if (!hydrated || claimed) {
     return null;

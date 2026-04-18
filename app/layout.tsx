@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { MainWithRouteKey } from "@/components/layout/MainWithRouteKey";
 import { SiteHeaderWithErrorBoundary } from "@/components/layout/SiteHeaderWithErrorBoundary";
 import { Providers } from "./providers";
+import { PromoTeaserVisibilityProvider } from "@/components/marketing/PromoTeaserVisibility";
 import { SubscribePromoPopup } from "@/components/marketing/SubscribePromoPopup";
 import { StickyScentFinder } from "@/components/navigation/StickyScentFinder";
 
@@ -56,8 +57,10 @@ export default function RootLayout({
         className={`${dmSans.variable} ${cormorant.variable} min-h-screen font-sans`}
       >
         <Providers>
-          <SubscribePromoPopup />
-          <StickyScentFinder />
+          <PromoTeaserVisibilityProvider>
+            <SubscribePromoPopup />
+            <StickyScentFinder />
+          </PromoTeaserVisibilityProvider>
           <div className="relative min-h-screen">
             <SiteHeaderWithErrorBoundary />
             <MainWithRouteKey>{children}</MainWithRouteKey>
