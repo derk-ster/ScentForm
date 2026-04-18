@@ -1,9 +1,25 @@
 import Link from "next/link";
-import { Instagram } from "lucide-react";
+import { Instagram, Twitter, Youtube } from "lucide-react";
 import { collections } from "@/lib/data/collections";
 import { policyLinks } from "@/lib/data/policies";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden
+    >
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+  );
+}
+
+const socialIconClass =
+  "inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/60 text-muted-foreground transition-colors hover:border-border hover:text-foreground";
 
 export function SiteFooter() {
   return (
@@ -136,14 +152,45 @@ export function SiteFooter() {
               More…
             </Link>
           </div>
-          <div className="flex items-center gap-3">
-            <a
-              href="https://www.instagram.com/"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/60 hover:text-foreground"
-              aria-label="Instagram"
-            >
-              <Instagram className="h-4 w-4" />
-            </a>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <a
+                href="https://x.com/scentform"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={socialIconClass}
+                aria-label="Scentform on X"
+              >
+                <Twitter className="h-4 w-4" />
+              </a>
+              <a
+                href="https://www.tiktok.com/@scentform"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={socialIconClass}
+                aria-label="Scentform on TikTok"
+              >
+                <TikTokIcon className="h-4 w-4" />
+              </a>
+              <a
+                href="https://www.youtube.com/@scentform"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={socialIconClass}
+                aria-label="Scentform on YouTube"
+              >
+                <Youtube className="h-4 w-4" />
+              </a>
+              <a
+                href="https://www.instagram.com/scentformofficial"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={socialIconClass}
+                aria-label="Scentform on Instagram"
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+            </div>
             <span className="text-xs">© {new Date().getFullYear()} Scentform</span>
           </div>
         </div>

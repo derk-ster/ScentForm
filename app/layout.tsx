@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/navigation/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { Providers } from "./providers";
+import { SubscribePromoPopup } from "@/components/marketing/SubscribePromoPopup";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -53,6 +54,7 @@ export default function RootLayout({
         className={`${dmSans.variable} ${cormorant.variable} min-h-screen font-sans`}
       >
         <Providers>
+          <SubscribePromoPopup />
           <div className="relative min-h-screen">
             <SiteHeader />
             <main>{children}</main>
