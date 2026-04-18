@@ -11,7 +11,7 @@ export const size = {
 
 export const contentType = "image/png";
 
-/** Apple touch icon — same asset, zoomed/cropped into rounded square (no mat). */
+/** Apple touch icon — same asset, slight inset (cover), rounded square, no mat. */
 export default async function AppleIcon() {
   const file = await readFile(
     join(process.cwd(), "Assets", "ScentFormLogo.png"),
@@ -36,8 +36,8 @@ export default async function AppleIcon() {
         <img
           alt=""
           src={src}
-          width={236}
-          height={236}
+          width={214}
+          height={214}
           style={{
             objectFit: "cover",
             objectPosition: "center",

@@ -11,7 +11,7 @@ export const size = {
 
 export const contentType = "image/png";
 
-/** Tab favicon — logo scaled/cropped into rounded square (no mat). */
+/** Tab favicon — logo slightly inset (cover) in rounded square, no mat. */
 export default async function Icon() {
   const file = await readFile(
     join(process.cwd(), "Assets", "ScentFormLogo.png"),
@@ -36,8 +36,8 @@ export default async function Icon() {
         <img
           alt=""
           src={src}
-          width={44}
-          height={44}
+          width={38}
+          height={38}
           style={{
             objectFit: "cover",
             objectPosition: "center",
