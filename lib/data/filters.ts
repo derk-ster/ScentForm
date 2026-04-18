@@ -1,4 +1,10 @@
 import type { ConcentrationHandle, Product } from "@/types/catalog";
+import {
+  productMatchesBudgetBand,
+  productMatchesGiftGuide,
+  productMatchesOccasion,
+  productMatchesVibe,
+} from "@/lib/data/product-ux";
 
 export type ShopFilters = {
   mood?: string | null;
@@ -7,6 +13,10 @@ export type ShopFilters = {
   collection?: string | null;
   q?: string | null;
   sort?: "featured" | "price-asc" | "price-desc" | "alpha";
+  vibe?: string | null;
+  budget?: string | null;
+  occasion?: string | null;
+  gift?: string | null;
 };
 
 function matchesMood(product: Product, mood: string) {
@@ -86,6 +96,26 @@ export function filterProducts(products: Product[], filters: ShopFilters) {
   if (filters.note) {
     const note = filters.note;
     out = out.filter((p) => matchesNote(p, note));
+  }
+
+  if (filters.vibe) {
+    const vibe = filters.vibe;
+    out = out.filter((p) => productMatchesVibe(p, vibe));
+  }
+
+  if (filters.budget) {
+    const budget = filters.budget;
+    out = out.filter((p) => productMatchesBudgetBand(p, budget));
+  }
+
+  if (filters.occasion) {
+    const occasion = filters.occasion;
+    out = out.filter((p) => productMatchesOccasion(p, occasion));
+  }
+
+  if (filters.gift) {
+    const gift = filters.gift;
+    out = out.filter((p) => productMatchesGiftGuide(p, gift));
   }
 
   if (filters.q) {

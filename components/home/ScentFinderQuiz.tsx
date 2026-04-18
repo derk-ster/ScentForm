@@ -1,13 +1,24 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, Check, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/Reveal";
 import { getCatalog, getDefaultVariant } from "@/lib/data/catalog";
 import { formatMoney } from "@/lib/utils/money";
+import type { Product, ProductVariant } from "@/types/catalog";
+import { useCartStore } from "@/store/cart-store";
+import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
+import {
+  minVariantPriceCents,
+  pickCardBadges,
+  quizExplainMatch,
+  getProductUx,
+} from "@/lib/data/product-ux";
+import { ProductBadges } from "@/components/product/ProductBadges";
 
 type VibeAnswer = "clean" | "warm" | "spiced" | "gourmand";
 type BoldAnswer = "subtle" | "statement";
@@ -95,7 +106,9 @@ function budgetMatchesCents(budget: BudgetAnswer, cents: number) {
   return d > 55;
 }
 
-function pickProduct(answers: Answers) {
+type Scored = { p: Product; score: number; ref: ProductVariant };
+
+function scoreCatalog(answers: Answers): Scored[] {
   const catalog = getCatalog();
   const scored = catalog.map((p) => {
     let score = 0;
@@ -137,7 +150,119 @@ function pickProduct(answers: Answers) {
     return { p, score, ref };
   });
   scored.sort((a, b) => b.score - a.score);
-  return scored[0];
+  return scored;
+}
+
+/** Three slots: best scoring match, value lane, premium lane — tweak scoring in scoreCatalog only. */
+function pickQuizTriple(answers: Answers): {
+  best: Scored;
+  budgetPick: Scored;
+  premiumPick: Scored;
+} | null {
+  const scored = scoreCatalog(answers);
+  const best = scored[0];
+  if (!best) return null;
+
+  const valuePool = scored
+    .filter((s) => minVariantPriceCents(s.p) < 4000)
+    .sort((a, b) => b.score - a.score);
+  let budgetPick =
+    valuePool.find((s) => s.p.handle !== best.p.handle) ?? valuePool[0] ?? scored[1] ?? best;
+
+  const premiumPool = scored
+    .filter(
+      (s) =>
+        minVariantPriceCents(s.p) >= 5200 ||
+        getProductUx(s.p).badges.includes("luxury-feel"),
+    )
+    .sort((a, b) => b.score - a.score);
+  let premiumPick =
+    premiumPool.find(
+      (s) => s.p.handle !== best.p.handle && s.p.handle !== budgetPick.p.handle,
+    ) ??
+    premiumPool.find((s) => s.p.handle !== budgetPick.p.handle) ??
+    premiumPool[0] ??
+    scored.find(
+      (s) => s.p.handle !== best.p.handle && s.p.handle !== budgetPick.p.handle,
+    ) ??
+    scored[Math.min(2, scored.length - 1)];
+
+  if (premiumPick.p.handle === budgetPick.p.handle) {
+    premiumPick =
+      scored.find(
+        (s) => s.p.handle !== best.p.handle && s.p.handle !== budgetPick.p.handle,
+      ) ?? premiumPick;
+  }
+
+  return { best, budgetPick, premiumPick };
+}
+
+function QuizResultCard({
+  label,
+  entry,
+  answers,
+}: {
+  label: string;
+  entry: Scored;
+  answers: Answers;
+}) {
+  const { playFrom } = useCartFly();
+  const reduceMotion = useReducedMotion();
+  const addLine = useCartStore((s) => s.addLine);
+  const why = quizExplainMatch(entry.p, answers);
+  const badges = pickCardBadges(entry.p, 3);
+
+  return (
+    <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
+        {label}
+      </p>
+      <div className="mt-3 flex gap-3">
+        <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl border border-border/50 bg-muted/20">
+          <Image
+            src={entry.p.images[0]}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="80px"
+          />
+        </div>
+        <div className="min-w-0 flex-1 space-y-2">
+          <p className="font-display text-lg leading-tight">{entry.p.title}</p>
+          <p className="text-xs text-muted-foreground">
+            From{" "}
+            <span className="font-medium text-foreground">
+              {formatMoney(entry.ref.priceCents, entry.ref.currencyCode)}
+            </span>
+            {" · "}
+            {entry.ref.sizeLabel}
+          </p>
+          <ProductBadges badges={badges} />
+          <p className="text-[11px] leading-relaxed text-muted-foreground">{why}</p>
+        </div>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <motion.div
+          whileTap={reduceMotion ? undefined : { scale: 0.96 }}
+          className="inline-flex"
+        >
+          <Button
+            type="button"
+            size="sm"
+            onClick={(e) => {
+              playFrom(e.currentTarget);
+              addLine({ product: entry.p, variant: entry.ref, quantity: 1 });
+            }}
+          >
+            Add to cart
+          </Button>
+        </motion.div>
+        <Button asChild size="sm" variant="outline">
+          <Link href={`/products/${entry.p.handle}`}>View product</Link>
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 export function ScentFinderQuiz() {
@@ -145,12 +270,20 @@ export function ScentFinderQuiz() {
   const [answers, setAnswers] = useState<Partial<Answers>>({});
 
   const complete = questions.every((q) => answers[q.id] !== undefined);
-  const result = useMemo(() => {
+  const triple = useMemo(() => {
     if (!complete) return null;
-    return pickProduct(answers as Answers);
+    try {
+      return pickQuizTriple(answers as Answers);
+    } catch {
+      return null;
+    }
   }, [answers, complete]);
 
-  const q = questions[step];
+  const safeStep = Math.min(
+    Math.max(0, step),
+    Math.max(0, questions.length - 1),
+  );
+  const q = questions[safeStep];
   const colsClass =
     q?.columns === 4
       ? "grid-cols-2 sm:grid-cols-4"
@@ -163,6 +296,7 @@ export function ScentFinderQuiz() {
   );
 
   const handlePick = (value: Answers[keyof Answers]) => {
+    if (!q) return;
     setAnswers((prev) => {
       const next = { ...prev, [q.id]: value } as Partial<Answers>;
       return next;
@@ -189,20 +323,20 @@ export function ScentFinderQuiz() {
               Quick match
             </p>
             <h2 className="mt-4 font-display text-3xl sm:text-4xl">
-              Five taps. One scent.
+              Five taps. Three picks.
             </h2>
             <p className="mt-3 text-sm text-muted-foreground">
-              Tell us your mood, budget, and when you&apos;ll wear it — we&apos;ll match
-              you with a fragrance from the catalog.
+              Tell us your mood, budget, and when you&apos;ll wear it — we&apos;ll suggest a
+              best match, a budget-friendly option, and a richer premium pick.
             </p>
           </div>
 
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-xl lg:max-w-2xl">
             <div className="rounded-2xl border border-border/60 bg-background/50 p-5 shadow-inner backdrop-blur">
               <div className="mb-4">
                 <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                   <span>
-                    {result ? "Result" : `${step + 1} / ${questions.length}`}
+                    {triple ? "Your lineup" : `${step + 1} / ${questions.length}`}
                   </span>
                   <span>{progressPct}%</span>
                 </div>
@@ -210,14 +344,25 @@ export function ScentFinderQuiz() {
                   <motion.div
                     className="h-full rounded-full bg-primary"
                     initial={false}
-                    animate={{ width: `${result ? 100 : progressPct}%` }}
+                    animate={{ width: `${triple ? 100 : progressPct}%` }}
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   />
                 </div>
               </div>
 
               <AnimatePresence mode="wait">
-                {!result ? (
+                {complete && !triple ? (
+                  <motion.div
+                    key="no-triple"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    className="rounded-xl border border-border/60 bg-background/40 p-4 text-sm text-muted-foreground"
+                  >
+                    We couldn&apos;t build picks from the catalog just now. Please refresh
+                    the page or try again later.
+                  </motion.div>
+                ) : !triple && q ? (
                   <motion.div
                     key={q.id + step}
                     initial={{ opacity: 0, x: 16 }}
@@ -280,54 +425,46 @@ export function ScentFinderQuiz() {
                       </Button>
                     </div>
                   </motion.div>
-                ) : (
+                ) : triple ? (
                   <motion.div
                     key="result"
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
                     transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="space-y-4"
                   >
                     <div className="flex items-center gap-2 text-xs text-primary">
                       <Check className="h-3.5 w-3.5" />
-                      Your match
+                      Curated from your answers
                     </div>
-                    <p className="mt-2 font-display text-xl">
-                      {result.p.title}
-                    </p>
-                    {result.p.tagline ? (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {result.p.tagline}
-                      </p>
-                    ) : null}
-                    <p className="mt-3 text-xs text-muted-foreground">
-                      From{" "}
-                      <span className="text-foreground">
-                        {formatMoney(
-                          result.ref.priceCents,
-                          result.ref.currencyCode,
-                        )}
-                      </span>{" "}
-                      · {result.ref.sizeLabel}
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Button asChild size="sm">
-                        <Link href={`/products/${result.p.handle}`}>
-                          Open product
-                        </Link>
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={reset}
-                      >
-                        <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-                        Retake
-                      </Button>
-                    </div>
+                    <QuizResultCard
+                      label="Best match"
+                      entry={triple.best}
+                      answers={answers as Answers}
+                    />
+                    <QuizResultCard
+                      label="Budget pick"
+                      entry={triple.budgetPick}
+                      answers={answers as Answers}
+                    />
+                    <QuizResultCard
+                      label="Premium / stronger pick"
+                      entry={triple.premiumPick}
+                      answers={answers as Answers}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={reset}
+                    >
+                      <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                      Retake quiz
+                    </Button>
                   </motion.div>
-                )}
+                ) : null}
               </AnimatePresence>
             </div>
           </div>

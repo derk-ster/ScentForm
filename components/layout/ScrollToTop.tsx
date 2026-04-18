@@ -4,9 +4,13 @@ import { useLayoutEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 function scrollTopInstant() {
-  window.scrollTo(0, 0);
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
+  try {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  } catch {
+    /* rare browser / scroll-lock edge cases during route transitions */
+  }
 }
 
 export function ScrollToTop() {

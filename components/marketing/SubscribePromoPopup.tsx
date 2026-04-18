@@ -58,7 +58,9 @@ export function SubscribePromoPopup() {
     }
 
     if (!forever) {
-      setDialogOpen(true);
+      /* Defer so first paint shows page content before modal + scroll lock */
+      const id = window.requestAnimationFrame(() => setDialogOpen(true));
+      return () => window.cancelAnimationFrame(id);
     }
   }, []);
 

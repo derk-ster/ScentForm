@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "predev": "node -e \"const fs=require('fs');const p='.next/cache/webpack';try{fs.rmSync(p,{recursive:true,force:true})}catch(e){}\"",
+    "dev": "next dev -p 3000",
+    "dev:turbo": "next dev --turbo -p 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

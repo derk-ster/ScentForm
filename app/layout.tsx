@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
-import { SiteHeader } from "@/components/navigation/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { MainWithRouteKey } from "@/components/layout/MainWithRouteKey";
+import { SiteHeaderWithErrorBoundary } from "@/components/layout/SiteHeaderWithErrorBoundary";
 import { Providers } from "./providers";
 import { SubscribePromoPopup } from "@/components/marketing/SubscribePromoPopup";
+import { StickyScentFinder } from "@/components/navigation/StickyScentFinder";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -49,15 +51,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body
         className={`${dmSans.variable} ${cormorant.variable} min-h-screen font-sans`}
       >
         <Providers>
           <SubscribePromoPopup />
+          <StickyScentFinder />
           <div className="relative min-h-screen">
-            <SiteHeader />
-            <main>{children}</main>
+            <SiteHeaderWithErrorBoundary />
+            <MainWithRouteKey>{children}</MainWithRouteKey>
             <SiteFooter />
           </div>
         </Providers>

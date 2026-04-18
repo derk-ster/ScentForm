@@ -1,7 +1,8 @@
 import type { Variants } from "framer-motion";
 
+/** Keep opacity at 1 so content is never hidden if `whileInView` fails to fire. */
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 14 },
+  hidden: { opacity: 1, y: 16 },
   show: {
     opacity: 1,
     y: 0,

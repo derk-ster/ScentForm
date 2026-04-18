@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
@@ -12,11 +11,15 @@ export default function NotFound() {
         The route does not exist in this build, or the handle changed.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
+        {/*
+          Full document navigation: recovers after a bad dev compile, service-worker,
+          or client-router glitch where <Link> would stay on a broken / RSC payload.
+        */}
         <Button asChild>
-          <Link href="/">Back home</Link>
+          <a href="/">Back to home</a>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/shop">Shop all</Link>
+          <a href="/shop">Shop all</a>
         </Button>
       </div>
     </div>

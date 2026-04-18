@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Minus, Plus, Sparkles, ZoomIn } from "lucide-react";
 import type { ConcentrationHandle, Product, ProductVariant } from "@/types/catalog";
 import { NotePyramid } from "@/components/product/NotePyramid";
@@ -18,6 +18,7 @@ import {
   getReviewSummary,
 } from "@/lib/data/catalog";
 import { useCartStore } from "@/store/cart-store";
+import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
 import { concentrations } from "@/lib/data/concentrations";
 import { getSmellsLike } from "@/lib/data/smellsLike";
 
@@ -30,6 +31,8 @@ function variantsForConcentration(product: Product, c: ConcentrationHandle) {
 }
 
 export function ProductPageView({ product }: Props) {
+  const { playFrom } = useCartFly();
+  const reduceMotion = useReducedMotion();
   const addLine = useCartStore((s) => s.addLine);
   const defaultVariant = useMemo(() => getDefaultVariant(product), [product]);
   const [concentration, setConcentration] = useState<ConcentrationHandle>(
@@ -44,6 +47,20 @@ export function ProductPageView({ product }: Props) {
     () => variantsForConcentration(product, concentration),
     [product, concentration],
   );
+
+  /**
+   * Soft navigation reuses this component — reset so we never pair a new product
+   * with the last product's variant (invalid ids / inconsistent state / FM glitches).
+   */
+  useEffect(() => {
+    const v0 = getDefaultVariant(product);
+    setConcentration(v0.concentration);
+    setVariant(v0);
+    setQty(1);
+    setImageIndex(0);
+    setLightboxOpen(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- reset only when product identity (handle) changes
+  }, [product.handle]);
 
   useEffect(() => {
     const still = sizes.find((v) => v.id === variant.id);
@@ -228,13 +245,21 @@ export function ProductPageView({ product }: Props) {
             </div>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Button
-                type="button"
-                className="flex-1 rounded-full"
-                onClick={() => addLine({ product, variant, quantity: qty })}
+              <motion.div
+                className="flex-1"
+                whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               >
-                Add to cart
-              </Button>
+                <Button
+                  type="button"
+                  className="w-full rounded-full"
+                  onClick={(e) => {
+                    playFrom(e.currentTarget);
+                    addLine({ product, variant, quantity: qty });
+                  }}
+                >
+                  Add to cart
+                </Button>
+              </motion.div>
               <Button asChild variant="outline" className="flex-1 rounded-full">
                 <Link href="/cart">Checkout</Link>
               </Button>
@@ -381,13 +406,21 @@ export function ProductPageView({ product }: Props) {
               {formatMoney(variant.priceCents * qty, variant.currencyCode)}
             </p>
           </div>
-          <Button
-            type="button"
-            className="flex-1 rounded-full"
-            onClick={() => addLine({ product, variant, quantity: qty })}
+          <motion.div
+            className="flex-1"
+            whileTap={reduceMotion ? undefined : { scale: 0.98 }}
           >
-            Add to cart
-          </Button>
+            <Button
+              type="button"
+              className="w-full rounded-full"
+              onClick={(e) => {
+                playFrom(e.currentTarget);
+                addLine({ product, variant, quantity: qty });
+              }}
+            >
+              Add to cart
+            </Button>
+          </motion.div>
         </div>
       </motion.div>
     </div>

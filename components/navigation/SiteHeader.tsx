@@ -19,12 +19,14 @@ import { megaCollections, megaConcentrations } from "./nav-data";
 import { useCartStore } from "@/store/cart-store";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { ThemeToggle } from "./ThemeToggle";
+import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
 
 export function SiteHeader() {
   const [solid, setSolid] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const count = useCartStore((s) => s.itemCount());
+  const { setCartAnchor } = useCartFly();
   const pathname = usePathname();
 
   const smoothScrollTop = () => {
@@ -209,23 +211,25 @@ export function SiteHeader() {
                 <UserRound className="h-5 w-5" />
               </Link>
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="relative"
-              asChild
-              aria-label="Cart"
-            >
-              <Link href="/cart">
-                <ShoppingBag className="h-5 w-5" />
-                {count > 0 ? (
-                  <span className="absolute -right-0.5 -top-0.5 inline-flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                    {count > 9 ? "9+" : count}
-                  </span>
-                ) : null}
-              </Link>
-            </Button>
+            <span ref={setCartAnchor} className="relative inline-flex shrink-0">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="relative"
+                asChild
+                aria-label="Cart"
+              >
+                <Link href="/cart">
+                  <ShoppingBag className="h-5 w-5" />
+                  {count > 0 ? (
+                    <span className="absolute -right-0.5 -top-0.5 inline-flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                      {count > 9 ? "9+" : count}
+                    </span>
+                  ) : null}
+                </Link>
+              </Button>
+            </span>
           </div>
         </div>
       </header>

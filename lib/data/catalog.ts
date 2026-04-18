@@ -387,6 +387,9 @@ export function getDefaultVariant(product: Product): ProductVariant {
     ) ??
     product.variants.find((v) => v.concentration === "edp" && v.sizeMl === 50) ??
     product.variants[0];
+  if (!preferred) {
+    throw new Error(`getDefaultVariant: product "${product.handle}" has no variants`);
+  }
   return preferred;
 }
 

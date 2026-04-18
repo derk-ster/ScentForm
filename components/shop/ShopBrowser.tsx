@@ -30,6 +30,10 @@ function parseFilters(searchParams: URLSearchParams): ShopFilters {
   const collection = searchParams.get("collection");
   const q = searchParams.get("q");
   const sort = (searchParams.get("sort") as ShopFilters["sort"]) || "featured";
+  const vibe = searchParams.get("vibe");
+  const budget = searchParams.get("budget");
+  const occasion = searchParams.get("occasion");
+  const gift = searchParams.get("gift");
   return {
     mood,
     note,
@@ -39,6 +43,10 @@ function parseFilters(searchParams: URLSearchParams): ShopFilters {
     collection,
     q,
     sort: sort ?? "featured",
+    vibe,
+    budget,
+    occasion,
+    gift,
   };
 }
 
@@ -156,7 +164,8 @@ export function ShopBrowser() {
             <div className="mt-10 rounded-2xl border border-dashed border-border/70 bg-card/30 p-10 text-center">
               <p className="font-display text-2xl">Nothing matches yet</p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Clear filters or try a broader note.
+                Clear filters, try a different vibe or budget from the homepage, or reset
+                to browse everything.
               </p>
               <Button
                 type="button"
@@ -167,7 +176,10 @@ export function ShopBrowser() {
               </Button>
             </div>
           ) : (
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div
+              id="shop-catalog"
+              className="mt-8 scroll-mt-28 grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+            >
               {products.map((p) => (
                 <ProductCard key={p.handle} product={p} />
               ))}
