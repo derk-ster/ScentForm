@@ -11,7 +11,7 @@ export const size = {
 
 export const contentType = "image/png";
 
-/** Tab favicon — uses `Assets/ScentFormLogo.png` with rounded frame for all browsers. */
+/** Tab favicon — logo scaled/cropped into rounded square (no mat). */
 export default async function Icon() {
   const file = await readFile(
     join(process.cwd(), "Assets", "ScentFormLogo.png"),
@@ -27,19 +27,20 @@ export default async function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#e4e4e7",
+          background: "transparent",
           borderRadius: 8,
+          overflow: "hidden",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse runtime */}
         <img
           alt=""
           src={src}
-          width={26}
-          height={26}
+          width={44}
+          height={44}
           style={{
-            objectFit: "contain",
-            borderRadius: 5,
+            objectFit: "cover",
+            objectPosition: "center",
           }}
         />
       </div>
