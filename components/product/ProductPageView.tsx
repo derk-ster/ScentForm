@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Minus, Plus, Sparkles, ZoomIn } from "lucide-react";
@@ -21,6 +21,9 @@ import { useCartStore } from "@/store/cart-store";
 import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
 import { concentrations } from "@/lib/data/concentrations";
 import { getSmellsLike } from "@/lib/data/smellsLike";
+import { getPdpEmojis } from "@/lib/data/product-ux";
+import { PdpEmojiRain } from "@/components/product/PdpEmojiRain";
+import { SaveProductHeart } from "@/components/account/SaveProductHeart";
 
 type Props = {
   product: Product;
@@ -32,9 +35,11 @@ function variantsForConcentration(product: Product, c: ConcentrationHandle) {
 
 export function ProductPageView({ product }: Props) {
   const isLifestyle = product.listingKind === "lifestyle";
+  const router = useRouter();
   const { playFrom } = useCartFly();
   const reduceMotion = useReducedMotion();
   const addLine = useCartStore((s) => s.addLine);
+  const clearCart = useCartStore((s) => s.clear);
   const defaultVariant = useMemo(() => getDefaultVariant(product), [product]);
   const [concentration, setConcentration] = useState<ConcentrationHandle>(
     defaultVariant.concentration,
@@ -125,7 +130,9 @@ export function ProductPageView({ product }: Props) {
         </div>
 
         <div className="lg:sticky lg:top-24">
-          <div className="rounded-3xl border border-border/70 bg-card/40 p-6 sm:p-8">
+          <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/40 p-6 sm:p-8">
+            <PdpEmojiRain emojis={getPdpEmojis(product)} seed={product.handle} />
+            <div className="relative z-[2]">
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
               {product.productTypeLabel}
               <span className="mx-2 text-border">·</span>
@@ -137,37 +144,39 @@ export function ProductPageView({ product }: Props) {
                 </>
               ) : null}
             </p>
-            <h1 className="mt-2 font-display text-4xl">{product.title}</h1>
+            <div className="mt-2 flex items-start justify-between gap-3">
+              <h1 className="font-display text-4xl leading-tight">{product.title}</h1>
+              <SaveProductHeart handle={product.handle} size="md" className="shrink-0" />
+            </div>
             {product.tagline ? (
               <p className="mt-2 text-sm text-primary">{product.tagline}</p>
             ) : null}
             <p className="mt-3 text-xs text-muted-foreground">
               {review.average.toFixed(1)}★ · {review.count} reviews
             </p>
-            <p className="mt-4 line-clamp-3 text-sm text-muted-foreground">
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               {product.description}
             </p>
 
             {(() => {
-              if (isLifestyle) return null;
               const dupe = getSmellsLike(product.handle);
               if (!dupe) return null;
               return (
-                <div className="mt-4 rounded-xl border border-primary/25 bg-primary/5 px-3.5 py-3">
-                  <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">
-                    <Sparkles className="h-3 w-3" />
+                <div className="mt-5 rounded-2xl border border-amber-200/70 bg-gradient-to-br from-amber-50/95 via-amber-50/60 to-amber-100/40 px-4 py-3.5 shadow-sm dark:border-amber-900/50 dark:from-amber-950/35 dark:via-amber-950/20 dark:to-amber-950/10">
+                  <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-900/90 dark:text-amber-200/90">
+                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
                     Smells like
                   </div>
-                  <p className="mt-1 text-sm leading-snug">
-                    <span className="font-medium text-foreground">
+                  <p className="mt-2 text-sm leading-snug text-amber-950/95 dark:text-amber-50/95">
+                    <span className="font-medium text-amber-950 dark:text-amber-50">
                       {dupe.brand} {dupe.name}
                     </span>
-                    <span className="text-muted-foreground">
+                    <span className="text-amber-900/75 dark:text-amber-100/70">
                       {" "}
                       · {dupe.note}
                     </span>
                   </p>
-                  <p className="mt-1.5 text-[10px] text-muted-foreground/70">
+                  <p className="mt-2 text-[10px] leading-relaxed text-amber-900/55 dark:text-amber-200/50">
                     Scent resemblance only — ALLURA 7 is not affiliated with{" "}
                     {dupe.brand}.
                   </p>
@@ -274,8 +283,17 @@ export function ProductPageView({ product }: Props) {
                   Add to cart
                 </Button>
               </motion.div>
-              <Button asChild variant="outline" className="flex-1 rounded-full">
-                <Link href="/cart">Checkout</Link>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1 rounded-full"
+                onClick={() => {
+                  clearCart();
+                  addLine({ product, variant, quantity: qty });
+                  router.push("/checkout");
+                }}
+              >
+                Checkout
               </Button>
             </div>
 
@@ -292,6 +310,7 @@ export function ProductPageView({ product }: Props) {
                 </p>
                 <p className="mt-1">See refund policy.</p>
               </div>
+            </div>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BrandStory } from "@/components/home/BrandStory";
 import { EmailCaptureBand } from "@/components/home/EmailCaptureBand";
 import { HeroSection } from "@/components/home/HeroSection";
-import { ScentFinderQuiz } from "@/components/home/ScentFinderQuiz";
+import { DiscoverHomeCta } from "@/components/home/DiscoverHomeCta";
 import { ShopByCategorySection } from "@/components/home/ShopByCategorySection";
 import { TrustBar } from "@/components/home/TrustBar";
 
@@ -18,7 +18,7 @@ export default function HomePage() {
       <HeroSection />
       <TrustBar />
       <ShopByCategorySection />
-      <ScentFinderQuiz />
+      <DiscoverHomeCta />
       <BrandStory />
       <EmailCaptureBand />
     </>

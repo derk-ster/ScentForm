@@ -17,6 +17,7 @@ import { ProductBadges } from "@/components/product/ProductBadges";
 import { ScentMeterBars } from "@/components/product/ScentMeterBars";
 import { ProductQuickView } from "@/components/product/ProductQuickView";
 import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
+import { SaveProductHeart } from "@/components/account/SaveProductHeart";
 
 type Props = {
   product: Product;
@@ -92,25 +93,27 @@ export function ProductCard({ product, className }: Props) {
         <div className="relative aspect-[3/4] overflow-hidden bg-muted/30">
           <Link
             href={`/products/${product.handle}`}
-            className="absolute inset-0 z-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+            className="absolute inset-0 z-0 block overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
             aria-label={`View ${product.title}`}
           >
-            <span className="sr-only">View product</span>
+            <Image
+              src={image}
+              alt={product.title}
+              fill
+              sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw"
+              className={cn(
+                "object-cover transition duration-500 ease-out",
+                hovered ? "scale-[1.02]" : "scale-100",
+              )}
+              priority={false}
+            />
           </Link>
-          <Image
-            src={image}
-            alt={product.title}
-            fill
-            sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw"
-            className={cn(
-              "object-cover transition duration-500 ease-out",
-              hovered ? "scale-[1.02]" : "scale-100",
-            )}
-            priority={false}
-          />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
           <div className="pointer-events-none absolute left-3 top-3 flex max-w-[85%] flex-wrap gap-2">
             {cornerBadges}
+          </div>
+          <div className="absolute right-3 top-3 z-20">
+            <SaveProductHeart handle={product.handle} />
           </div>
           <div className="absolute bottom-3 left-3 right-3 z-10 flex items-end justify-between gap-2">
             <div className="pointer-events-auto max-w-[70%]">

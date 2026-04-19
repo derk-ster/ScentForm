@@ -451,7 +451,6 @@ export function ScentFinderQuiz() {
 
   return (
     <section
-      id="scent-finder"
       className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8"
     >
       <Reveal className="overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-card/60 via-card/30 to-background/20 p-6 shadow-lg sm:p-10">

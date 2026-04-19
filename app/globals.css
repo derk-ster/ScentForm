@@ -86,10 +86,313 @@
     background: hsl(var(--primary) / 0.25);
     color: hsl(var(--foreground));
   }
+
+  /* Premium accent palettes (light) — muted vs default */
+  html[data-accent="moss"] {
+    --ring: 150 14% 38%;
+    --primary: 148 12% 36%;
+    --primary-foreground: 40 28% 98%;
+    --accent: 140 14% 91%;
+    --accent-foreground: 26 14% 16%;
+  }
+  html[data-accent="moss"] body {
+    background-image: linear-gradient(
+      180deg,
+      hsl(100 12% 97%) 0%,
+      hsl(90 10% 95%) 55%,
+      hsl(80 8% 93%) 100%
+    );
+  }
+
+  html[data-accent="wine"] {
+    --ring: 340 14% 42%;
+    --primary: 338 16% 38%;
+    --primary-foreground: 40 28% 98%;
+    --accent: 330 16% 92%;
+    --accent-foreground: 28 14% 16%;
+  }
+  html[data-accent="wine"] body {
+    background-image: linear-gradient(
+      180deg,
+      hsl(320 14% 97%) 0%,
+      hsl(315 12% 95%) 55%,
+      hsl(310 10% 93%) 100%
+    );
+  }
+
+  html.dark[data-accent="moss"] {
+    --ring: 145 16% 48%;
+    --primary: 142 14% 48%;
+    --primary-foreground: 28 14% 10%;
+    --accent: 150 8% 14%;
+    --accent-foreground: 40 16% 92%;
+  }
+  html.dark[data-accent="moss"] body {
+    background-image: linear-gradient(
+      180deg,
+      hsl(150 8% 8%) 0%,
+      hsl(145 7% 6%) 55%,
+      hsl(140 6% 5%) 100%
+    );
+  }
+
+  html.dark[data-accent="wine"] {
+    --ring: 340 16% 52%;
+    --primary: 338 14% 52%;
+    --primary-foreground: 28 14% 10%;
+    --accent: 320 10% 14%;
+    --accent-foreground: 40 16% 92%;
+  }
+  html.dark[data-accent="wine"] body {
+    background-image: linear-gradient(
+      180deg,
+      hsl(300 8% 9%) 0%,
+      hsl(295 7% 7%) 55%,
+      hsl(290 6% 5%) 100%
+    );
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+/* Homepage trust strip — slow infinite scroll */
+@keyframes trust-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.trust-marquee-inner {
+  animation: trust-marquee-scroll 72s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trust-marquee-inner {
+    animation: none;
+    transform: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 0.75rem;
+    width: 100% !important;
+    max-width: 72rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .trust-marquee-inner > div:last-child {
+    display: none;
+  }
+
+  .trust-marquee-inner > div:first-child {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Product detail — ambient wash (full PDP only) */
+.pdp-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.pdp-shell-bg {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.pdp-shell-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.pdp-shell--default .pdp-shell-bg {
+  background: transparent;
+}
+
+.pdp-shell--women .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 90% 55% at 50% -5%,
+      hsl(330 22% 52% / 0.11),
+      transparent 58%
+    ),
+    linear-gradient(180deg, hsl(325 18% 96% / 0.2) 0%, transparent 42%);
+}
+
+.dark .pdp-shell--women .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 90% 50% at 50% -5%,
+      hsl(330 18% 42% / 0.14),
+      transparent 55%
+    ),
+    linear-gradient(180deg, hsl(320 12% 14% / 0.35) 0%, transparent 40%);
+}
+
+.pdp-shell--men .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 95% 50% at 50% -8%,
+      hsl(215 18% 42% / 0.1),
+      transparent 58%
+    ),
+    linear-gradient(180deg, hsl(210 14% 96% / 0.18) 0%, transparent 42%);
+}
+
+.dark .pdp-shell--men .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 95% 50% at 50% -8%,
+      hsl(215 16% 38% / 0.12),
+      transparent 55%
+    ),
+    linear-gradient(180deg, hsl(220 10% 12% / 0.32) 0%, transparent 40%);
+}
+
+.pdp-shell--unisex .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 90% 48% at 50% -6%,
+      hsl(38 22% 48% / 0.1),
+      transparent 58%
+    ),
+    linear-gradient(180deg, hsl(40 16% 96% / 0.16) 0%, transparent 44%);
+}
+
+.dark .pdp-shell--unisex .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 90% 48% at 50% -6%,
+      hsl(35 18% 44% / 0.12),
+      transparent 55%
+    ),
+    linear-gradient(180deg, hsl(32 10% 12% / 0.3) 0%, transparent 40%);
+}
+
+.pdp-shell--body .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 85% 50% at 50% -5%,
+      hsl(15 16% 58% / 0.08),
+      transparent 58%
+    );
+}
+
+.dark .pdp-shell--body .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 85% 50% at 50% -5%,
+      hsl(20 12% 46% / 0.1),
+      transparent 55%
+    );
+}
+
+.pdp-shell--home .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 88% 52% at 50% -6%,
+      hsl(32 24% 48% / 0.09),
+      transparent 58%
+    );
+}
+
+.dark .pdp-shell--home .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 88% 52% at 50% -6%,
+      hsl(30 16% 42% / 0.11),
+      transparent 55%
+    );
+}
+
+.pdp-shell--incense .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 90% 50% at 50% -5%,
+      hsl(25 20% 46% / 0.09),
+      transparent 58%
+    );
+}
+
+.dark .pdp-shell--incense .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 90% 50% at 50% -5%,
+      hsl(25 14% 40% / 0.11),
+      transparent 55%
+    );
+}
+
+.pdp-shell--diffuser .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 90% 50% at 50% -6%,
+      hsl(195 14% 46% / 0.08),
+      transparent 58%
+    );
+}
+
+.dark .pdp-shell--diffuser .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 90% 50% at 50% -6%,
+      hsl(200 12% 38% / 0.1),
+      transparent 55%
+    );
+}
+
+.pdp-shell--gifts .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 88% 50% at 50% -5%,
+      hsl(280 12% 52% / 0.08),
+      transparent 58%
+    );
+}
+
+.dark .pdp-shell--gifts .pdp-shell-bg {
+  background: radial-gradient(
+      ellipse 88% 50% at 50% -5%,
+      hsl(275 10% 44% / 0.1),
+      transparent 55%
+    );
+}
+
+/* PDP emoji rain: 3s total — travel to stop band, then fade out */
+@keyframes pdp-emoji-fall {
+  0% {
+    top: var(--pdp-start-top, -10%);
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  12% {
+    opacity: 1;
+  }
+  82% {
+    top: var(--pdp-stop-top, 86%);
+    opacity: 1;
+    transform: translate3d(var(--pdp-drift, 0px), 0, 0);
+  }
+  100% {
+    top: var(--pdp-stop-top, 86%);
+    opacity: 0;
+    transform: translate3d(var(--pdp-drift, 0px), 0, 0);
+  }
+}
+
+.pdp-emoji-particle {
+  font-size: clamp(2.25rem, 5.5vw, 3.35rem);
+  animation-name: pdp-emoji-fall;
+  animation-duration: 3s;
+  animation-delay: var(--pdp-fall-delay, 0s);
+  animation-timing-function: cubic-bezier(0.22, 0.82, 0.28, 1);
+  animation-fill-mode: forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdp-emoji-particle {
+    animation: none;
+    opacity: 0.65;
+    top: 40%;
+    transform: none;
   }
 }

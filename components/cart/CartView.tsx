@@ -50,7 +50,7 @@ export function CartView() {
               <Link href="/shop">Shop all</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/#scent-finder">Find your scent</Link>
+              <Link href="/discover">Find your scent</Link>
             </Button>
           </div>
         </div>

@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import Script from "next/script";
 import { ProductPageView } from "@/components/product/ProductPageView";
 import { getCatalog, getDefaultVariant, getProductByHandle } from "@/lib/data/catalog";
+import { getPdpAmbienceModifier } from "@/lib/product/pdp-ambience";
+import { cn } from "@/lib/utils/cn";
 
 type Props = { params: { handle: string } };
 
@@ -62,7 +64,12 @@ export default function ProductPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ProductPageView product={product} />
+      <div className={cn("pdp-shell", getPdpAmbienceModifier(product))}>
+        <div className="pdp-shell-bg" aria-hidden />
+        <div className="pdp-shell-inner">
+          <ProductPageView product={product} />
+        </div>
+      </div>
     </>
   );
 }

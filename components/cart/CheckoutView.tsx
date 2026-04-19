@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,8 @@ import { formatMoney } from "@/lib/utils/money";
 import { useCartStore } from "@/store/cart-store";
 import { getProductByHandle } from "@/lib/data/catalog";
 import type { Product, ProductVariant } from "@/types/catalog";
+import { useAccountStore } from "@/store/account-store";
+import * as accountService from "@/lib/account/account-service";
 
 const SHIPPING_FLAT_CENTS = 0;
 const TAX_RATE = 0.0825;
@@ -25,10 +27,14 @@ export function CheckoutView() {
   const lines = useCartStore((s) => s.lines);
   const clear = useCartStore((s) => s.clear);
   const subtotal = useCartStore((s) => s.subtotalCents());
+  const session = useAccountStore((s) => s.session);
   const [placed, setPlaced] = useState<{ id: string; email: string } | null>(
     null,
   );
   const [submitting, setSubmitting] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [welcomeApplied, setWelcomeApplied] = useState(false);
   const [form, setForm] = useState({
     email: "",
     firstName: "",
@@ -61,8 +67,35 @@ export function CheckoutView() {
     return out;
   }, [lines]);
 
-  const tax = Math.round(subtotal * TAX_RATE);
-  const total = subtotal + tax + SHIPPING_FLAT_CENTS;
+  const discountCents = welcomeApplied
+    ? Math.round(subtotal * accountService.ACCOUNT_WELCOME_DISCOUNT)
+    : 0;
+  const taxable = Math.max(0, subtotal - discountCents);
+  const tax = Math.round(taxable * TAX_RATE);
+  const total = taxable + tax + SHIPPING_FLAT_CENTS;
+
+  useEffect(() => {
+    if (session?.email) {
+      setForm((f) => ({ ...f, email: f.email || session.email }));
+    }
+  }, [session?.email]);
+
+  const applyWelcomePromo = async () => {
+    setPromoError(null);
+    const c = promoCode.trim().toUpperCase();
+    if (c !== accountService.ACCOUNT_WELCOME_PROMO_CODE) {
+      setPromoError("That code is not valid here.");
+      setWelcomeApplied(false);
+      return;
+    }
+    const ok = await accountService.getWelcomePromoEligible();
+    if (!ok) {
+      setPromoError("Welcome offer already used or sign in with your account.");
+      setWelcomeApplied(false);
+      return;
+    }
+    setWelcomeApplied(true);
+  };
 
   const update = (key: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -74,6 +107,23 @@ export function CheckoutView() {
     setSubmitting(true);
     await new Promise((r) => setTimeout(r, 650));
     const id = makeOrderId();
+    await accountService.createOrder({
+      id,
+      email: form.email,
+      placedAt: new Date().toISOString(),
+      totalCents: total,
+      lines: resolved.map(({ line, product, variant }) => ({
+        productHandle: product.handle,
+        variantId: variant.id,
+        quantity: line.quantity,
+        title: product.title,
+        sizeLabel: variant.sizeLabel,
+        priceCentsEach: variant.priceCents,
+      })),
+    });
+    if (welcomeApplied) {
+      await accountService.markWelcomePromoUsed();
+    }
     setPlaced({ id, email: form.email });
     clear();
     setSubmitting(false);
@@ -348,11 +398,51 @@ export function CheckoutView() {
               ))}
             </ul>
 
+            <div className="mt-4 rounded-xl border border-border/60 bg-background/30 p-3">
+              <Label htmlFor="promo" className="text-[11px] uppercase tracking-wide">
+                Promo code
+              </Label>
+              <div className="mt-2 flex gap-2">
+                <Input
+                  id="promo"
+                  value={promoCode}
+                  onChange={(e) => {
+                    setPromoCode(e.target.value);
+                    setPromoError(null);
+                    setWelcomeApplied(false);
+                  }}
+                  placeholder={accountService.ACCOUNT_WELCOME_PROMO_CODE}
+                  className="text-sm"
+                  autoComplete="off"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="shrink-0"
+                  onClick={() => void applyWelcomePromo()}
+                >
+                  Apply
+                </Button>
+              </div>
+              {promoError ? (
+                <p className="mt-2 text-xs text-destructive">{promoError}</p>
+              ) : null}
+              {welcomeApplied ? (
+                <p className="mt-2 text-xs text-primary">Welcome 10% applied.</p>
+              ) : null}
+            </div>
+
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <dt className="text-muted-foreground">Subtotal</dt>
                 <dd>{formatMoney(subtotal, "USD")}</dd>
               </div>
+              {discountCents > 0 ? (
+                <div className="flex items-center justify-between text-primary">
+                  <dt>Account welcome</dt>
+                  <dd>-{formatMoney(discountCents, "USD")}</dd>
+                </div>
+              ) : null}
               <div className="flex items-center justify-between">
                 <dt className="text-muted-foreground">Shipping</dt>
                 <dd>

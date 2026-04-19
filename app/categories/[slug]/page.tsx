@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { getShopCategory, shopCategories } from "@/lib/data/categories";
 import { getProductsByPrimaryCategory } from "@/lib/data/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
+import { groupProductsByTypeLabel } from "@/lib/shop/group-products";
+import { CategoryQuizCta } from "@/components/categories/CategoryQuizCta";
 
 type Props = { params: { slug: string } };
 
@@ -24,6 +26,7 @@ export default function CategoryPage({ params }: Props) {
   const cat = getShopCategory(params.slug);
   if (!cat) notFound();
   const products = getProductsByPrimaryCategory(cat.handle);
+  const sections = groupProductsByTypeLabel(products, cat.handle);
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-24 pt-12 sm:px-6 lg:px-8">
@@ -48,6 +51,7 @@ export default function CategoryPage({ params }: Props) {
             ))}
           </div>
         ) : null}
+        <CategoryQuizCta products={products} category={cat.handle} />
       </header>
 
       <div className="mt-12 flex flex-wrap items-center justify-between gap-4">
@@ -62,9 +66,24 @@ export default function CategoryPage({ params }: Props) {
         </Link>
       </div>
 
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((p) => (
-          <ProductCard key={p.handle} product={p} />
+      <div className="space-y-14">
+        {sections.map((section, idx) => (
+          <section key={section.label} className={idx === 0 ? "mt-8" : "mt-2"}>
+            <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border/40 pb-4">
+              <h2 className="font-display text-2xl tracking-tight text-foreground">
+                {section.label}
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                {section.products.length}{" "}
+                {section.products.length === 1 ? "piece" : "pieces"}
+              </p>
+            </div>
+            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {section.products.map((p) => (
+                <ProductCard key={p.handle} product={p} />
+              ))}
+            </div>
+          </section>
         ))}
       </div>
     </div>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 import { usePromoTeaserVisibility } from "@/components/marketing/PromoTeaserVisibility";
 
-const hiddenPaths = new Set(["/cart", "/checkout"]);
+const hiddenPaths = new Set(["/cart", "/checkout", "/discover"]);
 const SESSION_DISMISS_KEY = "allura7-find-scent-bar-dismissed";
 
 export function StickyScentFinder() {
@@ -54,7 +54,7 @@ export function StickyScentFinder() {
           size="lg"
           className="pointer-events-auto rounded-full px-5 shadow-lg shadow-black/30"
         >
-          <Link href="/#scent-finder" className="gap-2">
+          <Link href="/discover" className="gap-2">
             <Sparkles className="h-4 w-4" aria-hidden />
             Discovery guide
           </Link>
@@ -73,7 +73,7 @@ export function StickyScentFinder() {
             size="lg"
             className="pointer-events-auto rounded-full px-5 shadow-lg shadow-black/30"
           >
-            <Link href="/#scent-finder" className="gap-2">
+            <Link href="/discover" className="gap-2">
               <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
               Discovery guide
             </Link>
@@ -81,13 +81,13 @@ export function StickyScentFinder() {
         </div>
       ) : mobileShowFullBar ? (
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:hidden">
-          <div className="pointer-events-auto mx-auto flex w-full max-w-md items-center gap-1 rounded-full border border-border/60 bg-background/95 py-1 pl-1 pr-0.5 shadow-lg shadow-black/30 backdrop-blur-md">
+          <div className="pointer-events-auto mx-auto flex w-full max-w-md items-center gap-1 rounded-full border border-primary/25 bg-primary/95 py-1 pl-1 pr-0.5 text-primary-foreground shadow-lg shadow-black/25 backdrop-blur-md">
             <Button
               asChild
               variant="ghost"
-              className="h-11 flex-1 justify-center gap-2 rounded-full px-3 font-medium hover:bg-transparent"
+              className="h-11 flex-1 justify-center gap-2 rounded-full px-3 font-medium text-primary-foreground hover:bg-primary-foreground/12 hover:text-primary-foreground"
             >
-              <Link href="/#scent-finder" className="flex items-center justify-center gap-2">
+              <Link href="/discover" className="flex items-center justify-center gap-2">
                 <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
                 Discovery guide
               </Link>
@@ -95,7 +95,7 @@ export function StickyScentFinder() {
             <button
               type="button"
               onClick={dismissFullBar}
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-primary-foreground/85 transition-colors hover:bg-primary-foreground/12 hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               aria-label="Hide Discovery guide for this visit"
             >
               <X className="h-4 w-4" aria-hidden />

@@ -41,7 +41,7 @@ export function HeroSection() {
               <Link href="/categories/home">Home scent</Link>
             </Button>
             <Button asChild size="lg" variant="ghost" className="rounded-full text-muted-foreground">
-              <Link href="/#scent-finder">Discovery guide</Link>
+              <Link href="/discover">Discovery guide</Link>
             </Button>
           </div>
         </motion.div>

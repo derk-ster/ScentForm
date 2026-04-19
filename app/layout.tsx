@@ -8,6 +8,7 @@ import { Providers } from "./providers";
 import { PromoTeaserVisibilityProvider } from "@/components/marketing/PromoTeaserVisibility";
 import { SubscribePromoPopup } from "@/components/marketing/SubscribePromoPopup";
 import { StickyScentFinder } from "@/components/navigation/StickyScentFinder";
+import { ACCENT_BOOTSTRAP_SCRIPT } from "@/lib/theme/accent";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -57,6 +58,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: ACCENT_BOOTSTRAP_SCRIPT }}
+        />
+      </head>
       <body
         className={`${dmSans.variable} ${cormorant.variable} min-h-screen font-sans`}
       >

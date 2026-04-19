@@ -104,8 +104,25 @@ export function ImageLightbox({
     return () => el.removeEventListener("wheel", handler);
   }, [open, scale, applyZoom]);
 
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (dragRef.current) {
+      try {
+        (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    }
+    dragRef.current = null;
+    setIsDragging(false);
+  };
+
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (scale <= 1) return;
+    // Pan only with the primary (left) button on mouse; ignore right/middle/aux.
+    if (!e.isPrimary) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
     (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
     dragRef.current = {
       startX: e.clientX,
@@ -120,6 +137,10 @@ export function ImageLightbox({
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
     if (!drag) return;
+    if (e.pointerType === "mouse" && (e.buttons & 1) === 0) {
+      endDrag(e);
+      return;
+    }
     const dx = e.clientX - drag.startX;
     const dy = e.clientY - drag.startY;
     if (!drag.moved && Math.hypot(dx, dy) > 3) drag.moved = true;
@@ -129,18 +150,6 @@ export function ImageLightbox({
         scale,
       ),
     );
-  };
-
-  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (dragRef.current) {
-      try {
-        (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId);
-      } catch {
-        // ignore
-      }
-    }
-    dragRef.current = null;
-    setIsDragging(false);
   };
 
   const onDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -181,7 +190,7 @@ export function ImageLightbox({
           <div
             className="pointer-events-none absolute left-1/2 top-5 z-20 -translate-x-1/2 select-none rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[11px] uppercase tracking-[0.25em] text-white/70 backdrop-blur"
           >
-            Scroll or double-click to zoom · drag to pan
+            Scroll or double-click to zoom · left-click drag to pan
           </div>
 
           <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/15 bg-black/60 p-1 text-white shadow-xl backdrop-blur">
@@ -224,6 +233,13 @@ export function ImageLightbox({
             onPointerMove={onPointerMove}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
+            onLostPointerCapture={() => {
+              dragRef.current = null;
+              setIsDragging(false);
+            }}
+            onContextMenu={(e) => {
+              if (scale > 1) e.preventDefault();
+            }}
             onDoubleClick={onDoubleClick}
             style={{
               cursor:
@@ -234,7 +250,7 @@ export function ImageLightbox({
                   : "zoom-in",
               touchAction: "none",
             }}
-            className="relative aspect-[3/4] h-auto max-h-[85vh] w-full max-w-[min(92vw,56rem)] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl"
+            className="relative aspect-[3/4] h-auto max-h-[85vh] w-full max-w-[min(92vw,56rem)] select-none overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl"
           >
             <div
               className="absolute inset-0 will-change-transform"

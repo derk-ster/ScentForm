@@ -16,6 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { PrimaryCategoryHandle } from "@/types/catalog";
+import { groupProductsByTypeLabel } from "@/lib/shop/group-products";
+import { ContextMatchQuiz } from "@/components/shop/ContextMatchQuiz";
 
 type Props = {
   collection: Collection;
@@ -44,6 +47,28 @@ export function CollectionBrowser({ collection }: Props) {
   }, [collection.handle, filters]);
 
   const skuCount = getSkuCountForCollection(collection.handle);
+
+  const dominantPrimary = useMemo((): PrimaryCategoryHandle | undefined => {
+    if (products.length === 0) return undefined;
+    const counts = new Map<PrimaryCategoryHandle, number>();
+    for (const p of products) {
+      counts.set(p.primaryCategory, (counts.get(p.primaryCategory) ?? 0) + 1);
+    }
+    let best: PrimaryCategoryHandle | undefined;
+    let n = 0;
+    for (const [k, v] of Array.from(counts.entries())) {
+      if (v > n) {
+        n = v;
+        best = k;
+      }
+    }
+    return best;
+  }, [products]);
+
+  const collectionSections = useMemo(
+    () => groupProductsByTypeLabel(products, dominantPrimary),
+    [products, dominantPrimary],
+  );
 
   const setParam = (key: string, value: string | null) => {
     const next = new URLSearchParams(searchParams.toString());
@@ -90,6 +115,16 @@ export function CollectionBrowser({ collection }: Props) {
               {collection.description}
             </p>
             <p className="mt-2 text-xs text-muted-foreground">{skuCount} SKUs</p>
+            {products.length > 0 ? (
+              <div className="mt-4">
+                <ContextMatchQuiz
+                  seedProducts={products}
+                  scope="collection"
+                  collectionHandle={collection.handle}
+                  triggerLabel="Find a fit"
+                />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -126,9 +161,23 @@ export function CollectionBrowser({ collection }: Props) {
                 </Button>
               </div>
             ) : (
-              <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {products.map((p) => (
-                  <ProductCard key={p.handle} product={p} />
+              <div className="mt-8 space-y-12">
+                {collectionSections.map((section) => (
+                  <section key={section.label}>
+                    <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border/40 pb-3">
+                      <h2 className="font-display text-xl tracking-tight sm:text-2xl">
+                        {section.label}
+                      </h2>
+                      <p className="text-xs text-muted-foreground">
+                        {section.products.length} items
+                      </p>
+                    </div>
+                    <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                      {section.products.map((p) => (
+                        <ProductCard key={p.handle} product={p} />
+                      ))}
+                    </div>
+                  </section>
                 ))}
               </div>
             )}

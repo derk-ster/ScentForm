@@ -2,7 +2,7 @@
  * Per-product shopping UX: badges, scent meters, vibe/budget/occasion tags.
  * Catalog `profile` powers fallbacks when a handle is not mapped here.
  */
-import type { Product } from "@/types/catalog";
+import type { Product, ScentFamilyTag } from "@/types/catalog";
 import type { ProductUxMeta, ShoppingBadgeId } from "@/types/shop-ux";
 
 export type { ShoppingBadgeId, ProductUxMeta, ScentMeterValues } from "@/types/shop-ux";
@@ -40,6 +40,50 @@ export function getProductUx(product: Product): ProductUxMeta {
   const row = productUxByHandle[product.handle];
   if (row) return row;
   return fallbackUx(product);
+}
+
+const FAMILY_EMOJI: Partial<Record<ScentFamilyTag, string[]>> = {
+  fresh: ["🍋", "💧", "🌿", "❄️", "🌊", "🧊", "✨", "🍃", "🌬️", "💎", "🫧", "🌤️"],
+  woody: ["🪵", "🌲", "🪹", "🍂", "🌳", "🪨", "🦌", "🌰", "🪶", "🪓", "🌴", "🪴"],
+  sweet: ["🍯", "🤎", "✨", "🍪", "🧁", "🍫", "🌰", "💫", "🥨", "🍮", "🌟", "🤍"],
+  floral: ["🌸", "🌷", "💐", "🌺", "🌼", "🪷", "🥀", "💮", "🌹", "🦋", "✨", "🌿"],
+  luxury: ["✨", "🖤", "🥂", "💎", "🪩", "🌙", "⚜️", "🕯️", "🖤", "✨", "🥃", "🪞"],
+};
+
+/** PDP decorative emojis — explicit `pdpEmojis` in UX map, else catalog heuristics. */
+export function getPdpEmojis(product: Product): string[] {
+  const row = productUxByHandle[product.handle];
+  if (row?.pdpEmojis?.length) return row.pdpEmojis.slice(0, 20);
+
+  const fromFamilies =
+    product.scentFamilies?.flatMap((f) => FAMILY_EMOJI[f] ?? []) ?? [];
+  if (fromFamilies.length) {
+    const seen = new Set<string>();
+    const uniq: string[] = [];
+    for (const e of fromFamilies) {
+      if (!seen.has(e)) {
+        seen.add(e);
+        uniq.push(e);
+      }
+    }
+    return uniq.slice(0, 16);
+  }
+
+  if (product.listingKind === "lifestyle") {
+    if (product.primaryCategory === "body")
+      return ["🧴", "💧", "🫧", "✨", "🌿", "💎", "🤍", "🫶", "🧖", "💫", "🌸", "🍃"];
+    if (product.primaryCategory === "home")
+      return ["🏠", "🕯️", "✨", "🛋️", "🪴", "💡", "🌙", "🪵", "🍂", "🤎", "✨", "🏡"];
+    if (product.primaryCategory === "incense")
+      return ["🪔", "✨", "🌫️", "🕯️", "🌿", "🪵", "💨", "🌸", "✨", "🪷", "🌙", "🤍"];
+    return ["✨", "🌿", "💫", "🌙", "💎", "🍃", "🌟", "🪴", "🤍", "✨", "🌊", "🫧"];
+  }
+
+  if (product.gender === "women")
+    return ["🌸", "✨", "💫", "🌷", "💐", "🦋", "🤍", "🌙", "💎", "🍃", "✨", "🌺"];
+  if (product.gender === "men")
+    return ["🖤", "🌲", "✨", "🪨", "🌊", "🪵", "⚡", "🌙", "💎", "🍃", "🪶", "🌿"];
+  return ["✨", "🌿", "🪵", "🌙", "💫", "🍃", "🌊", "🤍", "🪶", "✨", "🌲", "💎"];
 }
 
 export function minVariantPriceCents(product: Product): number {

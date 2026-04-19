@@ -17,6 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { groupProductsByTypeLabel } from "@/lib/shop/group-products";
+import { ContextMatchQuiz } from "@/components/shop/ContextMatchQuiz";
 
 const SCENT_FAMILIES: { value: ScentFamilyTag; label: string }[] = [
   { value: "fresh", label: "Fresh" },
@@ -93,6 +95,11 @@ export function ShopBrowser() {
   const products = useMemo(() => {
     return filterProducts(getCatalog(), filters);
   }, [filters]);
+
+  const groupedSections = useMemo(() => {
+    if (!filters.category) return null;
+    return groupProductsByTypeLabel(products, filters.category);
+  }, [products, filters.category]);
 
   const setParam = (key: string, value: string | null) => {
     const next = new URLSearchParams(searchParams.toString());
@@ -251,8 +258,27 @@ export function ShopBrowser() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-6 lg:flex-row">
-        <aside className="hidden w-64 shrink-0 lg:block">
-          <div className="sticky top-24 space-y-8">{filterSections}</div>
+          <aside className="hidden w-64 shrink-0 lg:block">
+          <div className="sticky top-24 space-y-8">
+            {filterSections}
+            {products.length > 0 ? (
+              <div className="border-t border-border/50 pt-6">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Stuck browsing?
+                </p>
+                <div className="mt-3">
+                  <ContextMatchQuiz
+                    seedProducts={products}
+                    scope="shop"
+                    category={filters.category}
+                    collectionHandle={filters.collection}
+                    triggerLabel="Find a fit"
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            ) : null}
+          </div>
         </aside>
 
         <div className="flex-1">
@@ -296,6 +322,26 @@ export function ShopBrowser() {
                 Reset filters
               </Button>
             </div>
+          ) : groupedSections ? (
+            <div id="shop-catalog" className="mt-8 scroll-mt-28 space-y-12">
+              {groupedSections.map((section) => (
+                <section key={section.label}>
+                  <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border/40 pb-3">
+                    <h2 className="font-display text-xl tracking-tight sm:text-2xl">
+                      {section.label}
+                    </h2>
+                    <p className="text-xs text-muted-foreground">
+                      {section.products.length} items
+                    </p>
+                  </div>
+                  <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                    {section.products.map((p) => (
+                      <ProductCard key={p.handle} product={p} />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           ) : (
             <div
               id="shop-catalog"
@@ -314,7 +360,21 @@ export function ShopBrowser() {
           <DialogHeader>
             <DialogTitle>Filters</DialogTitle>
           </DialogHeader>
-          <div className="space-y-8">{filterSections}</div>
+          <div className="space-y-8">
+            {filterSections}
+            {products.length > 0 ? (
+              <div className="border-t border-border/50 pt-4">
+                <ContextMatchQuiz
+                  seedProducts={products}
+                  scope="shop"
+                  category={filters.category}
+                  collectionHandle={filters.collection}
+                  triggerLabel="Find a fit"
+                  className="w-full"
+                />
+              </div>
+            ) : null}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

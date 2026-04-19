@@ -15,14 +15,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  megaCollections,
-  megaConcentrations,
-  megaShopCategories,
-} from "./nav-data";
+import { megaCollections, megaShopCategories } from "./nav-data";
 import { useCartStore } from "@/store/cart-store";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { ThemeToggle } from "./ThemeToggle";
+import { AccentPaletteMenu } from "./AccentPaletteMenu";
 import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
 
 export function SiteHeader() {
@@ -153,35 +150,8 @@ export function SiteHeader() {
               className="px-3 text-sm text-muted-foreground hover:text-foreground"
               asChild
             >
-              <Link href="/#scent-finder">Discover</Link>
+              <Link href="/discover">Discover</Link>
             </Button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="gap-1 px-3 text-sm text-muted-foreground hover:text-foreground"
-                >
-                  Wear
-                  <ChevronDown className="h-3.5 w-3.5 opacity-70" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-56">
-                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                  Personal fragrance
-                </DropdownMenuLabel>
-                <DropdownMenuItem asChild>
-                  <Link href="/concentrations">Overview</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {megaConcentrations.map((c) => (
-                  <DropdownMenuItem key={c.href} asChild>
-                    <Link href={c.href}>{c.label}</Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -210,6 +180,7 @@ export function SiteHeader() {
 
           <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-2">
             <ThemeToggle />
+            <AccentPaletteMenu />
             <Button
               type="button"
               variant="ghost"
@@ -273,6 +244,7 @@ export function SiteHeader() {
                 <span className="text-sm font-medium">Menu</span>
                 <div className="flex items-center gap-1">
                   <ThemeToggle />
+                  <AccentPaletteMenu />
                   <Button
                     type="button"
                     variant="ghost"
@@ -286,7 +258,7 @@ export function SiteHeader() {
               </div>
               <div className="flex-1 overflow-y-auto px-3 py-3 text-sm">
                 <Link
-                  href="/#scent-finder"
+                  href="/discover"
                   className="block border-b border-border/40 py-3 font-medium"
                   onClick={() => setMobileOpen(false)}
                 >
@@ -322,30 +294,6 @@ export function SiteHeader() {
                       View all
                     </Link>
                     {megaCollections.map((c) => (
-                      <Link
-                        key={c.href}
-                        href={c.href}
-                        className="block py-1.5 text-muted-foreground"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {c.label}
-                      </Link>
-                    ))}
-                  </div>
-                </details>
-                <details className="border-b border-border/40 py-2">
-                  <summary className="cursor-pointer list-none py-2 font-medium [&::-webkit-details-marker]:hidden">
-                    Wear
-                  </summary>
-                  <div className="space-y-1 pb-2 pl-2">
-                    <Link
-                      href="/concentrations"
-                      className="block py-1.5 text-muted-foreground"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      Overview
-                    </Link>
-                    {megaConcentrations.map((c) => (
                       <Link
                         key={c.href}
                         href={c.href}

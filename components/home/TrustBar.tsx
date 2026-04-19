@@ -1,7 +1,6 @@
 import { Droplets, Factory, Leaf, Recycle, Truck } from "lucide-react";
-import { Reveal } from "@/components/ui/Reveal";
 
-const items = [
+const baseItems = [
   { label: "USA made", icon: Factory },
   { label: "Cruelty-free", icon: Leaf },
   { label: "Phthalate-free", icon: Droplets },
@@ -9,20 +8,39 @@ const items = [
   { label: "Tracked shipping", icon: Truck },
 ];
 
+/** Repeat labels so the marquee track reads full before loop. */
+function expandedItems() {
+  return [...baseItems, ...baseItems, ...baseItems];
+}
+
 export function TrustBar() {
+  const segment = expandedItems();
   return (
-    <section className="border-y border-border/50 bg-card/30 py-4">
-      <Reveal className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-3 px-4 sm:px-6 lg:px-8">
-        {items.map((item) => (
-          <div
-            key={item.label}
-            className="flex items-center gap-2 text-xs text-muted-foreground"
-          >
-            <item.icon className="h-3.5 w-3.5 shrink-0 text-primary" />
-            <span className="whitespace-nowrap">{item.label}</span>
-          </div>
-        ))}
-      </Reveal>
+    <section className="border-y border-border/50 bg-card/30 py-3">
+      <div
+        className="trust-marquee relative mx-auto max-w-6xl overflow-hidden px-0 sm:px-6 lg:px-8"
+        aria-label="Trust and shipping highlights"
+      >
+        <div className="trust-marquee-inner flex w-max">
+          {[0, 1].map((dup) => (
+            <div
+              key={dup}
+              className="flex shrink-0 items-center gap-x-10 px-6 sm:gap-x-14 sm:px-8"
+              aria-hidden={dup === 1 || undefined}
+            >
+              {segment.map((item, idx) => (
+                <div
+                  key={`${dup}-${item.label}-${idx}`}
+                  className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground"
+                >
+                  <item.icon className="h-3.5 w-3.5 shrink-0 text-primary" />
+                  <span className="whitespace-nowrap">{item.label}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

@@ -32,4 +32,6 @@ export type ProductUxMeta = {
   budgetBands: string[];
   /** One line for quick view / quiz copy */
   bestFor: string;
+  /** Optional PDP hero emojis — see `getPdpEmojis` fallbacks when unset. */
+  pdpEmojis?: string[];
 };
