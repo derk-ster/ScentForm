@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, Search, ShoppingBag, UserRound, X } from "lucide-react";
@@ -25,12 +25,6 @@ import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { ThemeToggle } from "./ThemeToggle";
 import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
 
-const SHOP_NAV_ITEMS = [
-  { label: "Home products", href: "/categories/home" },
-  { label: "Body products", href: "/categories/body" },
-  { label: "Colognes & perfumes", href: "/categories/perfumes-colognes" },
-] as const;
-
 export function SiteHeader() {
   const [solid, setSolid] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -38,7 +32,6 @@ export function SiteHeader() {
   const count = useCartStore((s) => s.itemCount());
   const { setCartAnchor } = useCartFly();
   const pathname = usePathname();
-  const router = useRouter();
 
   const smoothScrollTop = () => {
     const reduced =
@@ -80,8 +73,8 @@ export function SiteHeader() {
             : "bg-background/80 backdrop-blur-sm",
         )}
       >
-        <div className="mx-auto grid h-[64px] w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-2 px-4 sm:gap-x-3 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center justify-self-start gap-2">
+        <div className="mx-auto flex h-[64px] max-w-6xl items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 shrink-0 items-center gap-2">
             <Button
               type="button"
               variant="ghost"
@@ -102,38 +95,7 @@ export function SiteHeader() {
             </Link>
           </div>
 
-          <div className="relative z-20 flex shrink-0 justify-center justify-self-center px-1">
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="gap-1 whitespace-nowrap px-2 text-sm font-medium text-foreground hover:bg-accent/60 hover:text-foreground sm:px-3"
-                >
-                  Shop
-                  <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" sideOffset={6} className="w-56">
-                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                  Shop by category
-                </DropdownMenuLabel>
-                {SHOP_NAV_ITEMS.map(({ label, href }) => (
-                  <DropdownMenuItem
-                    key={href}
-                    className="cursor-pointer"
-                    onSelect={() => {
-                      router.push(href);
-                    }}
-                  >
-                    {label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          <div className="flex min-w-0 items-center justify-end justify-self-end gap-2">
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
           <nav className="hidden min-w-0 shrink items-center gap-1 lg:flex">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -323,23 +285,6 @@ export function SiteHeader() {
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto px-3 py-3 text-sm">
-                <details className="group border-b border-border/40 py-2">
-                  <summary className="cursor-pointer list-none py-2 font-medium [&::-webkit-details-marker]:hidden">
-                    Shop
-                  </summary>
-                  <div className="space-y-1 pb-2 pl-2">
-                    {SHOP_NAV_ITEMS.map(({ label, href }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        className="block py-1.5 text-muted-foreground"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {label}
-                      </Link>
-                    ))}
-                  </div>
-                </details>
                 <Link
                   href="/#scent-finder"
                   className="block border-b border-border/40 py-3 font-medium"

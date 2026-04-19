@@ -65,7 +65,20 @@ export function ShopByCategorySection() {
         ))}
       </motion.div>
 
-      <div className="mt-6 space-y-4">
+      <Reveal className="mt-14 max-w-2xl">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+          Continue exploring
+        </p>
+        <h2 className="mt-2 font-display text-2xl sm:text-3xl">
+          Spotlights, signatures, and gift-ready picks
+        </h2>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Fresh drops, proven bestsellers, and tight edits for personal scent, home,
+          and gifting.
+        </p>
+      </Reveal>
+
+      <div className="mt-8 space-y-4">
         <motion.div
           className="grid gap-4 sm:grid-cols-2"
           variants={staggerContainer}
@@ -82,7 +95,7 @@ export function ShopByCategorySection() {
                 Curated
               </p>
               <div>
-                <p className="font-display text-xl text-foreground">New arrivals</p>
+                <h3 className="font-display text-xl text-foreground">New arrivals</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Latest drops across fragrance, body, and home.
                 </p>
@@ -101,7 +114,7 @@ export function ShopByCategorySection() {
                 Curated
               </p>
               <div>
-                <p className="font-display text-xl text-foreground">Best sellers</p>
+                <h3 className="font-display text-xl text-foreground">Best sellers</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   The pieces guests and regulars reach for first.
                 </p>
@@ -129,7 +142,7 @@ export function ShopByCategorySection() {
                 Curated
               </p>
               <div>
-                <p className="font-display text-xl text-foreground">Signature fragrances</p>
+                <h3 className="font-display text-xl text-foreground">Signature fragrances</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   House icons and everyday signatures — personal scent.
                 </p>
@@ -148,7 +161,7 @@ export function ShopByCategorySection() {
                 Curated
               </p>
               <div>
-                <p className="font-display text-xl text-foreground">Home scent essentials</p>
+                <h3 className="font-display text-xl text-foreground">Home scent essentials</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Candles, mists, and diffusion for rooms that linger.
                 </p>
@@ -167,7 +180,7 @@ export function ShopByCategorySection() {
                 Curated
               </p>
               <div>
-                <p className="font-display text-xl text-foreground">Gift sets</p>
+                <h3 className="font-display text-xl text-foreground">Gift sets</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Bundles ready to gift — fragrance, home, and ritual.
                 </p>
