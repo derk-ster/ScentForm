@@ -11,6 +11,20 @@ export type ShoppingBadgeId =
   | "gift-pick"
   | "luxury-feel";
 
+/** PDP detail-card wash — fixed hues in CSS, independent of header accent. */
+export type PdpSmellTintKey =
+  | "fresh"
+  | "floral"
+  | "woody"
+  | "sweet"
+  | "luxury"
+  | "body"
+  | "home"
+  | "incense"
+  | "diffuser"
+  | "gifts"
+  | "neutral";
+
 /** 1–5 scale for horizontal profile bars (fragrance guide, not gamified). */
 export type ScentMeterValues = {
   freshness: number;
@@ -34,4 +48,6 @@ export type ProductUxMeta = {
   bestFor: string;
   /** Optional PDP hero emojis — see `getPdpEmojis` fallbacks when unset. */
   pdpEmojis?: string[];
+  /** Optional wash on the PDP info card (emoji area) — overrides automatic smell tint. */
+  pdpSmellTint?: PdpSmellTintKey;
 };

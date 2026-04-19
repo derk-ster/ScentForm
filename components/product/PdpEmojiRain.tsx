@@ -30,18 +30,24 @@ type Props = {
   emojis: string[];
   /** Stable layout per product (e.g. product.handle). */
   seed: string;
+  /** When false, no emoji rain until the PDP info card is in the viewport (e.g. after scroll on phone). */
+  active?: boolean;
 };
 
 const PARTICLE_MIN = 28;
 const PARTICLE_RANGE = 8; /* 28–35 */
 
-export function PdpEmojiRain({ emojis, seed }: Props) {
+export function PdpEmojiRain({ emojis, seed, active = true }: Props) {
   const reduceMotion = useReducedMotion();
-  const [mounted, setMounted] = useState(false);
+  const [clientReady, setClientReady] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (!active) {
+      setClientReady(false);
+      return;
+    }
+    setClientReady(true);
+  }, [active]);
 
   const particles = useMemo((): Particle[] => {
     const base = emojis.length ? emojis : ["✨"];
@@ -75,7 +81,11 @@ export function PdpEmojiRain({ emojis, seed }: Props) {
     return out;
   }, [emojis, seed]);
 
-  if (!mounted || reduceMotion) {
+  if (!active) {
+    return null;
+  }
+
+  if (reduceMotion) {
     const base = emojis.length ? emojis : ["✨"];
     const pool = [...base, ...base, ...base, ...base];
     return (
@@ -88,6 +98,10 @@ export function PdpEmojiRain({ emojis, seed }: Props) {
         ))}
       </div>
     );
+  }
+
+  if (!clientReady) {
+    return null;
   }
 
   return (

@@ -201,159 +201,413 @@
   }
 }
 
-/* Product detail — ambient wash (full PDP only) */
-.pdp-shell {
-  position: relative;
-  isolation: isolate;
+/* PDP info card — smell wash: tall soft band (~upper half), slow horizontal drift */
+@keyframes pdp-smell-pan-1 {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 0%;
+  }
 }
 
-.pdp-shell-bg {
+@keyframes pdp-smell-pan-2 {
+  0% {
+    background-position: 0% 0%, 0% 0%;
+  }
+  100% {
+    background-position: 100% 0%, 100% 0%;
+  }
+}
+
+@keyframes pdp-smell-pan-3 {
+  0% {
+    background-position: 0% 0%, 0% 0%, 0% 0%;
+  }
+  100% {
+    background-position: 100% 0%, 100% 0%, 100% 0%;
+  }
+}
+
+.pdp-product-box-bg {
   pointer-events: none;
   position: absolute;
   inset: 0;
   z-index: 0;
+  border-radius: inherit;
+  background-repeat: no-repeat;
+  animation-duration: 28s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
 }
 
-.pdp-shell-inner {
-  position: relative;
-  z-index: 1;
+@media (prefers-reduced-motion: reduce) {
+  .pdp-product-box-bg {
+    animation: none !important;
+  }
 }
 
-.pdp-shell--default .pdp-shell-bg {
-  background: transparent;
+.pdp-product-box--neutral .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-1;
+  background-size: 280% 100%;
+  background-position: 0% 0%;
+  background-image: radial-gradient(
+    ellipse 130% 95% at 50% 0%,
+    hsl(220 14% 52% / 0.11),
+    hsl(220 18% 58% / 0.05) 38%,
+    transparent 52%
+  );
 }
 
-.pdp-shell--women .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 90% 55% at 50% -5%,
-      hsl(330 22% 52% / 0.11),
-      transparent 58%
+.dark .pdp-product-box--neutral .pdp-product-box-bg {
+  background-image: radial-gradient(
+    ellipse 130% 95% at 50% 0%,
+    hsl(220 12% 42% / 0.14),
+    hsl(220 14% 36% / 0.06) 38%,
+    transparent 52%
+  );
+}
+
+.pdp-product-box--fresh .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-2;
+  background-size: 280% 100%, 280% 100%;
+  background-position: 0% 0%, 0% 0%;
+  background-image: radial-gradient(
+      ellipse 125% 92% at 50% 0%,
+      hsl(188 42% 46% / 0.16),
+      hsl(195 38% 52% / 0.08) 36%,
+      transparent 52%
     ),
-    linear-gradient(180deg, hsl(325 18% 96% / 0.2) 0%, transparent 42%);
+    linear-gradient(
+      180deg,
+      hsl(186 35% 94% / 0.38) 0%,
+      hsl(192 32% 92% / 0.14) 38%,
+      transparent 50%
+    );
 }
 
-.dark .pdp-shell--women .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 90% 50% at 50% -5%,
-      hsl(330 18% 42% / 0.14),
+.dark .pdp-product-box--fresh .pdp-product-box-bg {
+  background-image: radial-gradient(
+      ellipse 125% 92% at 50% 0%,
+      hsl(188 38% 42% / 0.18),
+      hsl(198 32% 38% / 0.09) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(192 22% 14% / 0.42) 0%,
+      hsl(195 18% 16% / 0.16) 38%,
+      transparent 50%
+    );
+}
+
+.pdp-product-box--floral .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-2;
+  background-size: 280% 100%, 280% 100%;
+  background-position: 0% 0%, 0% 0%;
+  background-image: radial-gradient(
+      ellipse 125% 92% at 50% 0%,
+      hsl(328 32% 52% / 0.15),
+      hsl(310 28% 56% / 0.08) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(320 28% 96% / 0.36) 0%,
+      hsl(325 24% 94% / 0.12) 38%,
+      transparent 50%
+    );
+}
+
+.dark .pdp-product-box--floral .pdp-product-box-bg {
+  background-image: radial-gradient(
+      ellipse 125% 92% at 50% 0%,
+      hsl(325 26% 44% / 0.17),
+      hsl(315 22% 40% / 0.09) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(318 18% 14% / 0.4) 0%,
+      hsl(320 16% 16% / 0.14) 38%,
+      transparent 50%
+    );
+}
+
+.pdp-product-box--woody .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-2;
+  background-size: 280% 100%, 280% 100%;
+  background-position: 0% 0%, 0% 0%;
+  background-image: radial-gradient(
+      ellipse 128% 94% at 50% 0%,
+      hsl(28 36% 40% / 0.14),
+      hsl(38 30% 44% / 0.07) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(32 28% 94% / 0.32) 0%,
+      hsl(28 22% 92% / 0.12) 38%,
+      transparent 50%
+    );
+}
+
+.dark .pdp-product-box--woody .pdp-product-box-bg {
+  background-image: radial-gradient(
+      ellipse 128% 94% at 50% 0%,
+      hsl(30 32% 36% / 0.16),
+      hsl(35 26% 32% / 0.08) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(28 22% 12% / 0.38) 0%,
+      hsl(30 18% 14% / 0.14) 38%,
+      transparent 50%
+    );
+}
+
+.pdp-product-box--sweet .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-2;
+  background-size: 280% 100%, 280% 100%;
+  background-position: 0% 0%, 0% 0%;
+  background-image: radial-gradient(
+      ellipse 125% 92% at 50% 0%,
+      hsl(32 72% 48% / 0.13),
+      hsl(28 55% 52% / 0.07) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(38 55% 95% / 0.36) 0%,
+      hsl(32 48% 93% / 0.14) 38%,
+      transparent 50%
+    );
+}
+
+.dark .pdp-product-box--sweet .pdp-product-box-bg {
+  background-image: radial-gradient(
+      ellipse 125% 92% at 50% 0%,
+      hsl(30 48% 42% / 0.15),
+      hsl(25 40% 40% / 0.08) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(32 28% 12% / 0.38) 0%,
+      hsl(30 24% 14% / 0.14) 38%,
+      transparent 50%
+    );
+}
+
+.pdp-product-box--luxury .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-3;
+  background-size: 300% 100%, 300% 100%, 300% 100%;
+  background-position: 0% 0%, 0% 0%, 0% 0%;
+  background-image: radial-gradient(
+      ellipse 120% 90% at 50% 0%,
+      hsl(275 28% 46% / 0.14),
+      hsl(285 22% 50% / 0.07) 34%,
+      transparent 52%
+    ),
+    radial-gradient(
+      ellipse 95% 75% at 78% 8%,
+      hsl(45 55% 52% / 0.1),
+      hsl(38 45% 48% / 0.05) 40%,
       transparent 55%
     ),
-    linear-gradient(180deg, hsl(320 12% 14% / 0.35) 0%, transparent 40%);
+    linear-gradient(
+      180deg,
+      hsl(280 20% 96% / 0.32) 0%,
+      hsl(275 18% 94% / 0.12) 38%,
+      transparent 50%
+    );
 }
 
-.pdp-shell--men .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 95% 50% at 50% -8%,
-      hsl(215 18% 42% / 0.1),
-      transparent 58%
+.dark .pdp-product-box--luxury .pdp-product-box-bg {
+  background-image: radial-gradient(
+      ellipse 120% 90% at 50% 0%,
+      hsl(278 24% 40% / 0.17),
+      hsl(288 20% 36% / 0.08) 34%,
+      transparent 52%
     ),
-    linear-gradient(180deg, hsl(210 14% 96% / 0.18) 0%, transparent 42%);
-}
-
-.dark .pdp-shell--men .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 95% 50% at 50% -8%,
-      hsl(215 16% 38% / 0.12),
-      transparent 55%
-    ),
-    linear-gradient(180deg, hsl(220 10% 12% / 0.32) 0%, transparent 40%);
-}
-
-.pdp-shell--unisex .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 90% 48% at 50% -6%,
-      hsl(38 22% 48% / 0.1),
-      transparent 58%
-    ),
-    linear-gradient(180deg, hsl(40 16% 96% / 0.16) 0%, transparent 44%);
-}
-
-.dark .pdp-shell--unisex .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 90% 48% at 50% -6%,
-      hsl(35 18% 44% / 0.12),
+    radial-gradient(
+      ellipse 95% 75% at 78% 8%,
+      hsl(42 40% 48% / 0.12),
+      hsl(35 32% 40% / 0.06) 40%,
       transparent 55%
     ),
-    linear-gradient(180deg, hsl(32 10% 12% / 0.3) 0%, transparent 40%);
-}
-
-.pdp-shell--body .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 85% 50% at 50% -5%,
-      hsl(15 16% 58% / 0.08),
-      transparent 58%
+    linear-gradient(
+      180deg,
+      hsl(275 16% 12% / 0.4) 0%,
+      hsl(278 14% 14% / 0.14) 38%,
+      transparent 50%
     );
 }
 
-.dark .pdp-shell--body .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 85% 50% at 50% -5%,
-      hsl(20 12% 46% / 0.1),
-      transparent 55%
+.pdp-product-box--body .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-2;
+  background-size: 280% 100%, 280% 100%;
+  background-position: 0% 0%, 0% 0%;
+  background-image: radial-gradient(
+      ellipse 124% 92% at 50% 0%,
+      hsl(350 22% 58% / 0.12),
+      hsl(15 18% 56% / 0.06) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(15 20% 97% / 0.34) 0%,
+      hsl(12 16% 95% / 0.12) 38%,
+      transparent 50%
     );
 }
 
-.pdp-shell--home .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 88% 52% at 50% -6%,
-      hsl(32 24% 48% / 0.09),
-      transparent 58%
+.dark .pdp-product-box--body .pdp-product-box-bg {
+  background-image: radial-gradient(
+      ellipse 124% 92% at 50% 0%,
+      hsl(15 16% 46% / 0.14),
+      hsl(20 14% 40% / 0.07) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(20 12% 14% / 0.36) 0%,
+      hsl(18 10% 16% / 0.13) 38%,
+      transparent 50%
     );
 }
 
-.dark .pdp-shell--home .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 88% 52% at 50% -6%,
-      hsl(30 16% 42% / 0.11),
-      transparent 55%
+.pdp-product-box--home .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-2;
+  background-size: 280% 100%, 280% 100%;
+  background-position: 0% 0%, 0% 0%;
+  background-image: radial-gradient(
+      ellipse 125% 92% at 50% 0%,
+      hsl(38 32% 50% / 0.13),
+      hsl(32 28% 54% / 0.07) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(40 24% 96% / 0.34) 0%,
+      hsl(38 20% 94% / 0.12) 38%,
+      transparent 50%
     );
 }
 
-.pdp-shell--incense .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 90% 50% at 50% -5%,
-      hsl(25 20% 46% / 0.09),
-      transparent 58%
+.dark .pdp-product-box--home .pdp-product-box-bg {
+  background-image: radial-gradient(
+      ellipse 125% 92% at 50% 0%,
+      hsl(35 22% 42% / 0.14),
+      hsl(30 18% 38% / 0.07) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(32 14% 12% / 0.36) 0%,
+      hsl(30 12% 14% / 0.13) 38%,
+      transparent 50%
     );
 }
 
-.dark .pdp-shell--incense .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 90% 50% at 50% -5%,
-      hsl(25 14% 40% / 0.11),
-      transparent 55%
+.pdp-product-box--incense .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-2;
+  background-size: 280% 100%, 280% 100%;
+  background-position: 0% 0%, 0% 0%;
+  background-image: radial-gradient(
+      ellipse 126% 93% at 50% 0%,
+      hsl(28 45% 44% / 0.14),
+      hsl(22 38% 46% / 0.07) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(25 30% 95% / 0.32) 0%,
+      hsl(22 24% 93% / 0.12) 38%,
+      transparent 50%
     );
 }
 
-.pdp-shell--diffuser .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 90% 50% at 50% -6%,
-      hsl(195 14% 46% / 0.08),
-      transparent 58%
+.dark .pdp-product-box--incense .pdp-product-box-bg {
+  background-image: radial-gradient(
+      ellipse 126% 93% at 50% 0%,
+      hsl(25 32% 38% / 0.16),
+      hsl(20 28% 34% / 0.08) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(22 18% 12% / 0.38) 0%,
+      hsl(24 14% 14% / 0.14) 38%,
+      transparent 50%
     );
 }
 
-.dark .pdp-shell--diffuser .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 90% 50% at 50% -6%,
-      hsl(200 12% 38% / 0.1),
-      transparent 55%
+.pdp-product-box--diffuser .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-2;
+  background-size: 280% 100%, 280% 100%;
+  background-position: 0% 0%, 0% 0%;
+  background-image: radial-gradient(
+      ellipse 125% 92% at 50% 0%,
+      hsl(205 28% 48% / 0.12),
+      hsl(215 22% 52% / 0.06) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(210 22% 97% / 0.32) 0%,
+      hsl(208 18% 95% / 0.12) 38%,
+      transparent 50%
     );
 }
 
-.pdp-shell--gifts .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 88% 50% at 50% -5%,
-      hsl(280 12% 52% / 0.08),
-      transparent 58%
+.dark .pdp-product-box--diffuser .pdp-product-box-bg {
+  background-image: radial-gradient(
+      ellipse 125% 92% at 50% 0%,
+      hsl(205 22% 40% / 0.14),
+      hsl(215 18% 36% / 0.07) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(210 14% 12% / 0.36) 0%,
+      hsl(208 12% 14% / 0.13) 38%,
+      transparent 50%
     );
 }
 
-.dark .pdp-shell--gifts .pdp-shell-bg {
-  background: radial-gradient(
-      ellipse 88% 50% at 50% -5%,
-      hsl(275 10% 44% / 0.1),
-      transparent 55%
+.pdp-product-box--gifts .pdp-product-box-bg {
+  animation-name: pdp-smell-pan-2;
+  background-size: 280% 100%, 280% 100%;
+  background-position: 0% 0%, 0% 0%;
+  background-image: radial-gradient(
+      ellipse 124% 92% at 50% 0%,
+      hsl(285 22% 54% / 0.12),
+      hsl(275 20% 56% / 0.06) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(280 18% 97% / 0.32) 0%,
+      hsl(278 14% 95% / 0.12) 38%,
+      transparent 50%
+    );
+}
+
+.dark .pdp-product-box--gifts .pdp-product-box-bg {
+  background-image: radial-gradient(
+      ellipse 124% 92% at 50% 0%,
+      hsl(282 18% 44% / 0.14),
+      hsl(272 16% 40% / 0.07) 36%,
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      hsl(275 12% 14% / 0.36) 0%,
+      hsl(278 10% 16% / 0.13) 38%,
+      transparent 50%
     );
 }
 

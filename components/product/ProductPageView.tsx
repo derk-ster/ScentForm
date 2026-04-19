@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Minus, Plus, Sparkles, ZoomIn } from "lucide-react";
 import type { ConcentrationHandle, Product, ProductVariant } from "@/types/catalog";
@@ -22,8 +22,10 @@ import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
 import { concentrations } from "@/lib/data/concentrations";
 import { getSmellsLike } from "@/lib/data/smellsLike";
 import { getPdpEmojis } from "@/lib/data/product-ux";
+import { getPdpProductBoxTintClass } from "@/lib/product/pdp-ambience";
 import { PdpEmojiRain } from "@/components/product/PdpEmojiRain";
 import { SaveProductHeart } from "@/components/account/SaveProductHeart";
+import { cn } from "@/lib/utils/cn";
 
 type Props = {
   product: Product;
@@ -48,6 +50,8 @@ export function ProductPageView({ product }: Props) {
   const [qty, setQty] = useState(1);
   const [imageIndex, setImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const infoBoxRef = useRef<HTMLDivElement>(null);
+  const [infoBoxInView, setInfoBoxInView] = useState(false);
 
   const sizes = useMemo(
     () => variantsForConcentration(product, concentration),
@@ -67,6 +71,24 @@ export function ProductPageView({ product }: Props) {
     setLightboxOpen(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- reset only when product identity (handle) changes
   }, [product.handle]);
+
+  useEffect(() => {
+    setInfoBoxInView(false);
+  }, [product.handle]);
+
+  useEffect(() => {
+    if (infoBoxInView) return;
+    const el = infoBoxRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setInfoBoxInView(true);
+      },
+      { root: null, threshold: 0.12 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [infoBoxInView, product.handle]);
 
   useEffect(() => {
     const still = sizes.find((v) => v.id === variant.id);
@@ -130,8 +152,19 @@ export function ProductPageView({ product }: Props) {
         </div>
 
         <div className="lg:sticky lg:top-24">
-          <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/40 p-6 sm:p-8">
-            <PdpEmojiRain emojis={getPdpEmojis(product)} seed={product.handle} />
+          <div
+            ref={infoBoxRef}
+            className={cn(
+              "pdp-product-box isolate relative overflow-hidden rounded-3xl border border-border/70 bg-card/40 p-6 sm:p-8",
+              getPdpProductBoxTintClass(product),
+            )}
+          >
+            <div className="pdp-product-box-bg" aria-hidden />
+            <PdpEmojiRain
+              emojis={getPdpEmojis(product)}
+              seed={product.handle}
+              active={infoBoxInView}
+            />
             <div className="relative z-[2]">
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
               {product.productTypeLabel}
