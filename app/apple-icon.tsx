@@ -14,7 +14,7 @@ export const contentType = "image/png";
 /** Apple touch icon — same asset, slight inset (cover), rounded square, no mat. */
 export default async function AppleIcon() {
   const file = await readFile(
-    join(process.cwd(), "Assets", "ScentFormLogo.png"),
+    join(process.cwd(), "Assets", "Allura7Logo.png"),
   );
   const src = `data:image/png;base64,${file.toString("base64")}`;
 

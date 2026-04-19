@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import brandLogo from "../../Assets/Allura7Logo.png";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -88,10 +90,21 @@ export function SiteHeader() {
             <Link
               href="/"
               onClick={onLogoClick}
-              className="font-display text-base tracking-[0.12em] text-foreground transition-opacity hover:opacity-80 sm:text-lg lg:text-xl"
+              className="flex min-w-0 items-center gap-2.5 text-foreground transition-opacity hover:opacity-80 sm:gap-3"
               aria-label="ALLURA 7 home"
             >
-              ALLURA 7
+              <Image
+                src={brandLogo}
+                alt=""
+                width={brandLogo.width}
+                height={brandLogo.height}
+                priority
+                className="h-8 w-auto max-h-8 max-w-[7.5rem] shrink-0 rounded-md object-contain sm:h-9 sm:max-h-9 sm:max-w-[8.5rem]"
+                aria-hidden
+              />
+              <span className="font-display text-base tracking-[0.12em] sm:text-lg lg:text-xl">
+                ALLURA 7
+              </span>
             </Link>
           </div>
 

@@ -14,7 +14,7 @@ export const contentType = "image/png";
 /** Tab favicon — logo slightly inset (cover) in rounded square, no mat. */
 export default async function Icon() {
   const file = await readFile(
-    join(process.cwd(), "Assets", "ScentFormLogo.png"),
+    join(process.cwd(), "Assets", "Allura7Logo.png"),
   );
   const src = `data:image/png;base64,${file.toString("base64")}`;
 
