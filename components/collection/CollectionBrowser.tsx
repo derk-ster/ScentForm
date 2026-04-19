@@ -1,16 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SlidersHorizontal } from "lucide-react";
+import Image from "next/image";
 import type { Collection } from "@/types/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { concentrations } from "@/lib/data/concentrations";
 import { getProductsByCollection, getSkuCountForCollection } from "@/lib/data/catalog";
-import type { ConcentrationHandle } from "@/types/catalog";
 import { filterProducts, type ShopFilters } from "@/lib/data/filters";
 import {
   Dialog,
@@ -18,21 +16,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getConcentrationByHandle } from "@/lib/data/concentrations";
 
 type Props = {
   collection: Collection;
 };
 
 function parseFilters(searchParams: URLSearchParams): ShopFilters {
-  const concentration = searchParams.get("concentration") as
-    | ConcentrationHandle
-    | null;
   const sort = (searchParams.get("sort") as ShopFilters["sort"]) || "featured";
   return {
-    concentration: concentration && getConcentrationByHandle(concentration)
-      ? concentration
-      : null,
     sort: sort ?? "featured",
   };
 }
@@ -62,6 +53,24 @@ export function CollectionBrowser({ collection }: Props) {
     router.push(qs ? `${pathname}?${qs}` : pathname);
   };
 
+  const sortControl = (
+    <div>
+      <Label className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+        Sort
+      </Label>
+      <select
+        className="mt-3 w-full rounded-md border border-border/80 bg-card/60 px-3 py-2 text-sm"
+        value={filters.sort ?? "featured"}
+        onChange={(e) => setParam("sort", e.target.value)}
+      >
+        <option value="featured">Featured</option>
+        <option value="price-asc">Price, low to high</option>
+        <option value="price-desc">Price, high to low</option>
+        <option value="alpha">Alphabetically, A–Z</option>
+      </select>
+    </div>
+  );
+
   return (
     <div>
       <div className="relative border-b border-border/60">
@@ -80,7 +89,7 @@ export function CollectionBrowser({ collection }: Props) {
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
               {collection.description}
             </p>
-            <p className="mt-2 text-xs text-muted-foreground">{skuCount} variants</p>
+            <p className="mt-2 text-xs text-muted-foreground">{skuCount} SKUs</p>
           </div>
         </div>
       </div>
@@ -88,47 +97,7 @@ export function CollectionBrowser({ collection }: Props) {
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 lg:flex-row">
           <aside className="hidden w-56 shrink-0 lg:block">
-            <div className="sticky top-24 space-y-6">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                  Concentration
-                </p>
-                <div className="mt-3 space-y-2">
-                  <button
-                    type="button"
-                    className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
-                    onClick={() => setParam("concentration", null)}
-                  >
-                    Any
-                  </button>
-                  {concentrations.map((c) => (
-                    <button
-                      key={c.handle}
-                      type="button"
-                      className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
-                      onClick={() => setParam("concentration", c.handle)}
-                    >
-                      {c.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <Label className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                  Sort
-                </Label>
-                <select
-                  className="mt-3 w-full rounded-md border border-border/80 bg-card/60 px-3 py-2 text-sm"
-                  value={filters.sort ?? "featured"}
-                  onChange={(e) => setParam("sort", e.target.value)}
-                >
-                  <option value="featured">Featured</option>
-                  <option value="price-asc">Price, low to high</option>
-                  <option value="price-desc">Price, high to low</option>
-                  <option value="alpha">Alphabetically, A–Z</option>
-                </select>
-              </div>
-            </div>
+            <div className="sticky top-24 space-y-6">{sortControl}</div>
           </aside>
 
           <div className="flex-1">
@@ -141,7 +110,7 @@ export function CollectionBrowser({ collection }: Props) {
                 onClick={() => setMobileFiltersOpen(true)}
               >
                 <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Filters
+                Sort
               </Button>
             </div>
 
@@ -170,35 +139,9 @@ export function CollectionBrowser({ collection }: Props) {
       <Dialog open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Filters</DialogTitle>
+            <DialogTitle>Sort</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setParam("concentration", null);
-                setMobileFiltersOpen(false);
-              }}
-            >
-              Any concentration
-            </Button>
-            {concentrations.map((c) => (
-              <Button
-                key={c.handle}
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setParam("concentration", c.handle);
-                  setMobileFiltersOpen(false);
-                }}
-              >
-                {c.shortLabel}
-              </Button>
-            ))}
-          </div>
+          {sortControl}
         </DialogContent>
       </Dialog>
     </div>

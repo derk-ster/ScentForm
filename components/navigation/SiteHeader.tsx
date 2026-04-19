@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, Search, ShoppingBag, UserRound, X } from "lucide-react";
@@ -15,11 +15,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { megaCollections, megaConcentrations } from "./nav-data";
+import {
+  megaCollections,
+  megaConcentrations,
+  megaShopCategories,
+} from "./nav-data";
 import { useCartStore } from "@/store/cart-store";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { ThemeToggle } from "./ThemeToggle";
 import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
+
+const SHOP_NAV_ITEMS = [
+  { label: "Home products", href: "/categories/home" },
+  { label: "Body products", href: "/categories/body" },
+  { label: "Colognes & perfumes", href: "/categories/perfumes-colognes" },
+] as const;
 
 export function SiteHeader() {
   const [solid, setSolid] = useState(false);
@@ -28,6 +38,7 @@ export function SiteHeader() {
   const count = useCartStore((s) => s.itemCount());
   const { setCartAnchor } = useCartFly();
   const pathname = usePathname();
+  const router = useRouter();
 
   const smoothScrollTop = () => {
     const reduced =
@@ -69,13 +80,13 @@ export function SiteHeader() {
             : "bg-background/80 backdrop-blur-sm",
         )}
       >
-        <div className="mx-auto flex h-[64px] max-w-6xl items-center gap-3 px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-1 items-center gap-2 lg:flex-none">
+        <div className="mx-auto grid h-[64px] w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-2 px-4 sm:gap-x-3 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center justify-self-start gap-2">
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="shrink-0 lg:hidden"
               aria-label="Open menu"
               onClick={() => setMobileOpen(true)}
             >
@@ -84,14 +95,46 @@ export function SiteHeader() {
             <Link
               href="/"
               onClick={onLogoClick}
-              className="font-display text-lg tracking-[0.12em] text-foreground transition-opacity hover:opacity-80 sm:text-xl"
-              aria-label="Scentform home"
+              className="font-display text-base tracking-[0.12em] text-foreground transition-opacity hover:opacity-80 sm:text-lg lg:text-xl"
+              aria-label="ALLURA 7 home"
             >
-              SCENTFORM
+              ALLURA 7
             </Link>
           </div>
 
-          <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">
+          <div className="relative z-20 flex shrink-0 justify-center justify-self-center px-1">
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="gap-1 whitespace-nowrap px-2 text-sm font-medium text-foreground hover:bg-accent/60 hover:text-foreground sm:px-3"
+                >
+                  Shop
+                  <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" sideOffset={6} className="w-56">
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                  Shop by category
+                </DropdownMenuLabel>
+                {SHOP_NAV_ITEMS.map(({ label, href }) => (
+                  <DropdownMenuItem
+                    key={href}
+                    className="cursor-pointer"
+                    onSelect={() => {
+                      router.push(href);
+                    }}
+                  >
+                    {label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="flex min-w-0 items-center justify-end justify-self-end gap-2">
+          <nav className="hidden min-w-0 shrink items-center gap-1 lg:flex">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -99,20 +142,19 @@ export function SiteHeader() {
                   variant="ghost"
                   className="gap-1 px-3 text-sm text-muted-foreground hover:text-foreground"
                 >
-                  Shop
+                  Categories
                   <ChevronDown className="h-3.5 w-3.5 opacity-70" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link href="/shop">Shop all</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/best-sellers">Best sellers</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/new-arrivals">New arrivals</Link>
-                </DropdownMenuItem>
+              <DropdownMenuContent align="center" className="max-h-72 w-56 overflow-y-auto">
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                  Browse
+                </DropdownMenuLabel>
+                {megaShopCategories.map((c) => (
+                  <DropdownMenuItem key={c.href} asChild>
+                    <Link href={c.href}>{c.label}</Link>
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -129,7 +171,7 @@ export function SiteHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="max-h-72 w-56 overflow-y-auto">
                 <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                  Lines
+                  Curated edits
                 </DropdownMenuLabel>
                 <DropdownMenuItem asChild>
                   <Link href="/collections">View all</Link>
@@ -143,6 +185,15 @@ export function SiteHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            <Button
+              type="button"
+              variant="ghost"
+              className="px-3 text-sm text-muted-foreground hover:text-foreground"
+              asChild
+            >
+              <Link href="/#scent-finder">Discover</Link>
+            </Button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -150,13 +201,13 @@ export function SiteHeader() {
                   variant="ghost"
                   className="gap-1 px-3 text-sm text-muted-foreground hover:text-foreground"
                 >
-                  Concentration
+                  Wear
                   <ChevronDown className="h-3.5 w-3.5 opacity-70" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-56">
                 <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                  Wear level
+                  Personal fragrance
                 </DropdownMenuLabel>
                 <DropdownMenuItem asChild>
                   <Link href="/concentrations">Overview</Link>
@@ -195,7 +246,7 @@ export function SiteHeader() {
             </DropdownMenu>
           </nav>
 
-          <div className="flex flex-1 items-center justify-end gap-1 sm:gap-2 lg:flex-none">
+          <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-2">
             <ThemeToggle />
             <Button
               type="button"
@@ -230,6 +281,7 @@ export function SiteHeader() {
                 </Link>
               </Button>
             </span>
+          </div>
           </div>
         </div>
       </header>
@@ -276,27 +328,40 @@ export function SiteHeader() {
                     Shop
                   </summary>
                   <div className="space-y-1 pb-2 pl-2">
-                    <Link
-                      href="/shop"
-                      className="block py-1.5 text-muted-foreground"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      Shop all
-                    </Link>
-                    <Link
-                      href="/best-sellers"
-                      className="block py-1.5 text-muted-foreground"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      Best sellers
-                    </Link>
-                    <Link
-                      href="/new-arrivals"
-                      className="block py-1.5 text-muted-foreground"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      New arrivals
-                    </Link>
+                    {SHOP_NAV_ITEMS.map(({ label, href }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        className="block py-1.5 text-muted-foreground"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        {label}
+                      </Link>
+                    ))}
+                  </div>
+                </details>
+                <Link
+                  href="/#scent-finder"
+                  className="block border-b border-border/40 py-3 font-medium"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Discover
+                </Link>
+                <details className="border-b border-border/40 py-2">
+                  <summary className="cursor-pointer list-none py-2 font-medium [&::-webkit-details-marker]:hidden">
+                    Categories
+                  </summary>
+                  <div className="max-h-52 space-y-1 overflow-y-auto pb-2 pl-2">
+                    {megaShopCategories.map((c) => (
+                      <Link
+                        key={c.href}
+                        href={c.href}
+                        className="block py-1.5 text-muted-foreground"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        {c.label}
+                      </Link>
+                    ))}
                   </div>
                 </details>
                 <details className="border-b border-border/40 py-2">
@@ -325,7 +390,7 @@ export function SiteHeader() {
                 </details>
                 <details className="border-b border-border/40 py-2">
                   <summary className="cursor-pointer list-none py-2 font-medium [&::-webkit-details-marker]:hidden">
-                    Concentration
+                    Wear
                   </summary>
                   <div className="space-y-1 pb-2 pl-2">
                     <Link

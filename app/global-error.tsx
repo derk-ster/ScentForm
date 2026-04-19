@@ -22,7 +22,7 @@ export default function GlobalError({
             Critical error
           </p>
           <h1 className="mt-3 font-display text-3xl sm:text-4xl">
-            Scentform hit a problem
+            ALLURA 7 hit a problem
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
             The page shell failed to render. Reload or go home to continue.

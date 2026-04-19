@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Eye, Plus } from "lucide-react";
 import type { Product } from "@/types/catalog";
 import { cn } from "@/lib/utils/cn";
 import { formatMoney } from "@/lib/utils/money";
-import { getDefaultVariant } from "@/lib/data/catalog";
+import { getDefaultVariant, getReviewSummary } from "@/lib/data/catalog";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cart-store";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
@@ -32,10 +32,52 @@ export function ProductCard({ product, className }: Props) {
   const addLine = useCartStore((s) => s.addLine);
   const defaultVariant = getDefaultVariant(product);
   const ux = getProductUx(product);
+  const review = getReviewSummary(product.handle);
   const image =
     hovered && product.hoverImage ? product.hoverImage : product.images[0];
   const fromPrice = Math.min(...product.variants.map((v) => v.priceCents));
   const badges = pickCardBadges(product, 4);
+  const cornerBadges: ReactNode[] = [];
+  if (product.limitedEdition) {
+    cornerBadges.push(
+      <span
+        key="lim"
+        className="rounded-full border border-amber-400/60 bg-amber-950/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-50"
+      >
+        Limited
+      </span>,
+    );
+  }
+  if (product.isNew && cornerBadges.length < 2) {
+    cornerBadges.push(
+      <span
+        key="new"
+        className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground"
+      >
+        New
+      </span>,
+    );
+  }
+  if (product.isBestSeller && cornerBadges.length < 2) {
+    cornerBadges.push(
+      <span
+        key="bs"
+        className="rounded-full bg-foreground px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-background"
+      >
+        Best seller
+      </span>,
+    );
+  }
+  if (product.isSignature && cornerBadges.length < 2) {
+    cornerBadges.push(
+      <span
+        key="sig"
+        className="rounded-full border border-primary/40 bg-background/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"
+      >
+        Signature
+      </span>,
+    );
+  }
 
   return (
     <>
@@ -67,12 +109,8 @@ export function ProductCard({ product, className }: Props) {
             priority={false}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-          <div className="pointer-events-none absolute left-3 top-3 flex flex-wrap gap-2">
-            {product.isNew ? (
-              <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
-                New
-              </span>
-            ) : null}
+          <div className="pointer-events-none absolute left-3 top-3 flex max-w-[85%] flex-wrap gap-2">
+            {cornerBadges}
           </div>
           <div className="absolute bottom-3 left-3 right-3 z-10 flex items-end justify-between gap-2">
             <div className="pointer-events-auto max-w-[70%]">
@@ -95,8 +133,10 @@ export function ProductCard({ product, className }: Props) {
           </div>
         </div>
         <div className="space-y-2 px-4 pb-2 pt-4">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-            {product.collectionTitle}
+          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            <span className="text-foreground/90">{product.productTypeLabel}</span>
+            <span className="mx-1.5 text-border">·</span>
+            {product.categoryTitle}
           </p>
           <Link
             href={`/products/${product.handle}`}
@@ -104,9 +144,26 @@ export function ProductCard({ product, className }: Props) {
           >
             {product.title}
           </Link>
-          <ScentMeterBars meters={ux.meters} compact className="pt-1" />
+          <p className="text-[11px] tabular-nums text-muted-foreground">
+            <span className="text-foreground/90">{review.average.toFixed(1)}</span>
+            <span className="text-amber-400/90"> ★</span>
+            <span className="mx-1 text-border">·</span>
+            {review.count} reviews
+          </p>
+          {product.subtitle ? (
+            <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+              {product.subtitle}
+            </p>
+          ) : null}
+          {product.listingKind === "fragrance" ? (
+            <ScentMeterBars meters={ux.meters} compact className="pt-1" />
+          ) : (
+            <p className="line-clamp-2 pt-1 text-[11px] leading-relaxed text-muted-foreground">
+              {ux.bestFor}
+            </p>
+          )}
         </div>
-        <div className="flex items-center justify-between gap-3 border-t border-border/50 px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/50 px-4 py-3">
           <p className="text-sm font-semibold tabular-nums">
             {formatMoney(fromPrice, "USD")}
           </p>
@@ -117,16 +174,17 @@ export function ProductCard({ product, className }: Props) {
             <Button
               ref={addToCartRef}
               type="button"
-              size="icon"
+              size="sm"
               variant="secondary"
-              className="h-9 w-9 rounded-full"
+              className="h-9 gap-1.5 rounded-full px-3 sm:px-4"
               aria-label={`Add ${product.title} to cart`}
               onClick={() => {
                 playFrom(addToCartRef.current);
                 addLine({ product, variant: defaultVariant, quantity: 1 });
               }}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" aria-hidden />
+              <span className="hidden sm:inline">Add to cart</span>
             </Button>
           </motion.span>
         </div>

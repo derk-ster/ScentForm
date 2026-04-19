@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Orders",
-  description: "View your Scentform order history.",
+  description: "View your ALLURA 7 order history.",
 };
 
 export default function OrdersPage() {

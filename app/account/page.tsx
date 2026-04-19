@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Account",
-  description: "Sign in to manage your Scentform account, orders, and addresses.",
+  description: "Sign in to manage your ALLURA 7 account, orders, and addresses.",
 };
 
 export default function AccountPage() {

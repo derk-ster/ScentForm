@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Affiliate program",
   description:
-    "Join the Scentform affiliate program — earn commission while sharing fragrances you already love.",
+    "Join the ALLURA 7 affiliate program — earn commission while sharing fragrances you already love.",
 };
 
 export default function AffiliatePage() {
@@ -18,7 +18,7 @@ export default function AffiliatePage() {
         Affiliate program — 15% commission
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-        Share Scentform with your audience and earn on qualifying purchases. We
+        Share ALLURA 7 with your audience and earn on qualifying purchases. We
         handle tracking, assets, and payouts — you focus on the content.
       </p>
 

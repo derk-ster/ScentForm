@@ -9,7 +9,7 @@ export function MinimalSiteHeader() {
           href="/"
           className="font-display text-lg tracking-[0.12em] text-foreground sm:text-xl"
         >
-          SCENTFORM
+          ALLURA 7
         </a>
         <a
           href="/cart"

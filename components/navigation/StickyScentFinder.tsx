@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils/cn";
 import { usePromoTeaserVisibility } from "@/components/marketing/PromoTeaserVisibility";
 
 const hiddenPaths = new Set(["/cart", "/checkout"]);
-const SESSION_DISMISS_KEY = "scentform-find-scent-bar-dismissed";
+const SESSION_DISMISS_KEY = "allura7-find-scent-bar-dismissed";
 
 export function StickyScentFinder() {
   const pathname = usePathname();
@@ -56,7 +56,7 @@ export function StickyScentFinder() {
         >
           <Link href="/#scent-finder" className="gap-2">
             <Sparkles className="h-4 w-4" aria-hidden />
-            Find my scent
+            Discovery guide
           </Link>
         </Button>
       </div>
@@ -75,7 +75,7 @@ export function StickyScentFinder() {
           >
             <Link href="/#scent-finder" className="gap-2">
               <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
-              Find my scent
+              Discovery guide
             </Link>
           </Button>
         </div>
@@ -89,14 +89,14 @@ export function StickyScentFinder() {
             >
               <Link href="/#scent-finder" className="flex items-center justify-center gap-2">
                 <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
-                Find my scent
+                Discovery guide
               </Link>
             </Button>
             <button
               type="button"
               onClick={dismissFullBar}
               className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label="Hide Find my scent for this visit"
+              aria-label="Hide Discovery guide for this visit"
             >
               <X className="h-4 w-4" aria-hidden />
             </button>

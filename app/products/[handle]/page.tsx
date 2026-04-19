@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: product.title,
     description: product.description,
     openGraph: {
-      title: `${product.title} · Scentform`,
+      title: `${product.title} · ALLURA 7`,
       description: product.description,
       images: product.images,
     },
@@ -45,10 +45,10 @@ export default function ProductPage({ params }: Props) {
     name: product.title,
     description: product.description,
     image: product.images,
-    brand: { "@type": "Brand", name: "Scentform" },
+    brand: { "@type": "Brand", name: "ALLURA 7" },
     offers: {
       "@type": "Offer",
-      url: `https://scentform.com/products/${product.handle}`,
+      url: `https://allura7.com/products/${product.handle}`,
       priceCurrency: v.currencyCode,
       price: String(v.priceCents / 100),
       availability: "https://schema.org/InStock",

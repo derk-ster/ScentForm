@@ -23,30 +23,30 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://scentform.com"),
+  metadataBase: new URL("https://allura7.com"),
   icons: {
     icon: [{ url: "/icon", sizes: "32x32", type: "image/png" }],
     apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }],
   },
   title: {
-    default: "Scentform | Signature perfumes & colognes",
-    template: "%s · Scentform",
+    default: "ALLURA 7 | Luxury fragrance & home scent",
+    template: "%s · ALLURA 7",
   },
   description:
-    "Modern niche-leaning fragrances with multiple concentrations and sizes — built for real wear, not shelf candy.",
+    "ALLURA 7 — luxury perfumes, body care, home scent, incense, ultrasonic diffusers, and oils. Premium shopping, full pricing, and refined discovery.",
   openGraph: {
-    title: "Scentform",
+    title: "ALLURA 7",
     description:
-      "Premium fragrance storefront — collections, concentrations, and honest product detail.",
+      "Luxury fragrance lifestyle — personal scent, body rituals, and home atmosphere with modern ecommerce clarity.",
     type: "website",
     locale: "en_US",
-    siteName: "Scentform",
+    siteName: "ALLURA 7",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Scentform",
+    title: "ALLURA 7",
     description:
-      "Premium fragrance storefront — collections, concentrations, and honest product detail.",
+      "Luxury perfumes, body, home, incense, and diffusers — ALLURA 7 premium catalog and shopping experience.",
   },
 };
 

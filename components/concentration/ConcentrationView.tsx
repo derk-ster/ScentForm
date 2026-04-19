@@ -60,11 +60,27 @@ export function ConcentrationView({ concentration }: Props) {
             Full shop
           </Link>
         </div>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((p) => (
-            <ProductCard key={p.handle} product={p} />
-          ))}
-        </div>
+        {products.length === 0 ? (
+          <div className="mt-8 rounded-2xl border border-dashed border-border/70 bg-card/30 p-10 text-center text-sm text-muted-foreground">
+            <p>
+              This catalog is offered primarily as{" "}
+              <Link href="/concentrations/edp" className="text-foreground underline-offset-4 hover:underline">
+                Eau de Parfum
+              </Link>{" "}
+              and cologne strengths. Browse the{" "}
+              <Link href="/shop?category=perfumes-colognes" className="text-foreground underline-offset-4 hover:underline">
+                personal fragrance shop
+              </Link>{" "}
+              for every current release.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {products.map((p) => (
+              <ProductCard key={p.handle} product={p} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

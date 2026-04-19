@@ -27,9 +27,9 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-sm">
-            <p className="font-display text-xl tracking-[0.12em]">SCENTFORM</p>
+            <p className="font-display text-xl tracking-[0.12em]">ALLURA 7</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Fragrances made to wear.
+              Luxury fragrance lifestyle — skin, space, and air.
             </p>
             <form className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center">
               <label className="sr-only" htmlFor="footer-email">
@@ -143,7 +143,7 @@ export function SiteFooter() {
 
         <div className="mt-10 flex flex-col gap-4 border-t border-border/50 pt-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap gap-x-4 gap-y-2">
-            {collections.slice(0, 6).map((c) => (
+            {collections.slice(0, 5).map((c) => (
               <Link key={c.handle} href={`/collections/${c.handle}`} className="hover:text-foreground">
                 {c.title}
               </Link>
@@ -155,43 +155,43 @@ export function SiteFooter() {
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
               <a
-                href="https://x.com/scentform"
+                href="https://x.com/allura7"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={socialIconClass}
-                aria-label="Scentform on X"
+                aria-label="ALLURA 7 on X"
               >
                 <Twitter className="h-4 w-4" />
               </a>
               <a
-                href="https://www.tiktok.com/@scentform"
+                href="https://www.tiktok.com/@allura7"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={socialIconClass}
-                aria-label="Scentform on TikTok"
+                aria-label="ALLURA 7 on TikTok"
               >
                 <TikTokIcon className="h-4 w-4" />
               </a>
               <a
-                href="https://www.youtube.com/@scentform"
+                href="https://www.youtube.com/@allura7"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={socialIconClass}
-                aria-label="Scentform on YouTube"
+                aria-label="ALLURA 7 on YouTube"
               >
                 <Youtube className="h-4 w-4" />
               </a>
               <a
-                href="https://www.instagram.com/scentformofficial"
+                href="https://www.instagram.com/allura7official"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={socialIconClass}
-                aria-label="Scentform on Instagram"
+                aria-label="ALLURA 7 on Instagram"
               >
                 <Instagram className="h-4 w-4" />
               </a>
             </div>
-            <span className="text-xs">© {new Date().getFullYear()} Scentform</span>
+            <span className="text-xs">© {new Date().getFullYear()} ALLURA 7</span>
           </div>
         </div>
       </div>

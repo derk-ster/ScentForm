@@ -3,9 +3,9 @@ import { Suspense } from "react";
 import { ShopBrowser } from "@/components/shop/ShopBrowser";
 
 export const metadata: Metadata = {
-  title: "Shop all fragrances",
+  title: "Shop",
   description:
-    "Browse the full Scentform catalog with filters for collection, concentration, and more.",
+    "Browse the full ALLURA 7 catalog — filter by category, collection, scent family, gender, new arrivals, best sellers, and price.",
 };
 
 export default function ShopPage() {

@@ -4,7 +4,7 @@ import { SearchPageClient } from "@/components/search/SearchPageClient";
 
 export const metadata: Metadata = {
   title: "Search",
-  description: "Search the Scentform catalog.",
+  description: "Search the ALLURA 7 catalog.",
 };
 
 export default function SearchPage() {

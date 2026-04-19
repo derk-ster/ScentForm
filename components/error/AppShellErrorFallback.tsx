@@ -5,7 +5,7 @@ export function AppShellErrorFallback() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-16 text-center text-foreground">
       <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
-        Scentform
+        ALLURA 7
       </p>
       <h1 className="mt-4 max-w-md font-display text-3xl sm:text-4xl">
         Something broke while loading this page

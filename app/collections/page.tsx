@@ -5,7 +5,8 @@ import { collections } from "@/lib/data/collections";
 
 export const metadata: Metadata = {
   title: "Collections",
-  description: "Browse Scentform fragrance lines — each collection is a complete wear story.",
+  description:
+    "Browse ALLURA 7 collections — personal fragrance, body, home, incense, diffusers, and gifts.",
 };
 
 export default function CollectionsIndexPage() {

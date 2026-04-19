@@ -6,12 +6,12 @@ type Props = { params: { slug: string } };
 
 const bodies: Record<string, string[]> = {
   "terms-of-service": [
-    "These terms govern your use of the Scentform website and the purchases made through it.",
+    "These terms govern your use of the ALLURA 7 website and the purchases made through it.",
     "Product descriptions, pricing, and availability may change as inventory updates. Taxes and shipping are calculated at checkout.",
     "By placing an order you agree to the terms listed here. If anything is unclear, reach out via the contact page before purchasing.",
   ],
   "privacy-policy": [
-    "Scentform collects information necessary to fulfill orders, prevent fraud, and improve the shopping experience.",
+    "ALLURA 7 collects information necessary to fulfill orders, prevent fraud, and improve the shopping experience.",
     "Marketing emails are sent only when you opt in. You can unsubscribe from any marketing message.",
     "We do not sell personal information. Processors we use for payments, shipping, and analytics are covered by contract and applicable data protection laws.",
   ],

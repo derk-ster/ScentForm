@@ -1,120 +1,14 @@
 /**
  * Per-product shopping UX: badges, scent meters, vibe/budget/occasion tags.
- * Edit values here — catalog `profile` is separate and used by quiz/filters as fallback only.
+ * Catalog `profile` powers fallbacks when a handle is not mapped here.
  */
 import type { Product } from "@/types/catalog";
 import type { ProductUxMeta, ShoppingBadgeId } from "@/types/shop-ux";
 
 export type { ShoppingBadgeId, ProductUxMeta, ScentMeterValues } from "@/types/shop-ux";
 
-const M = {
-  aura: {
-    badges: ["fresh", "daily-wear", "best-seller", "gift-pick"] as ShoppingBadgeId[],
-    meters: { freshness: 4, sweetness: 2, warmth: 3, projection: 3, longevity: 3 },
-    vibes: ["fresh-clean", "everyday-wear", "luxury-feel"],
-    occasions: ["school-work", "casual-everyday", "signature-scent"],
-    budgetBands: ["20-40", "40-60", "best-value"],
-    bestFor: "Polished days when you want woods without heaviness.",
-  },
-  billionaire: {
-    badges: ["fresh", "budget-pick", "daily-wear", "best-seller"],
-    meters: { freshness: 5, sweetness: 2, warmth: 3, projection: 4, longevity: 3 },
-    vibes: ["fresh-clean", "everyday-wear"],
-    occasions: ["school-work", "casual-everyday", "gift"],
-    budgetBands: ["under-20", "20-40", "best-value"],
-    bestFor: "Sharp citrus confidence on a smart budget.",
-  },
-  "bleu-marine": {
-    badges: ["fresh", "long-lasting", "daily-wear", "gift-pick"],
-    meters: { freshness: 5, sweetness: 1, warmth: 2, projection: 3, longevity: 4 },
-    vibes: ["fresh-clean", "everyday-wear"],
-    occasions: ["school-work", "vacation", "casual-everyday"],
-    budgetBands: ["20-40", "40-60"],
-    bestFor: "Cool, mineral clarity — office-safe and heat-friendly.",
-  },
-  "desert-rose": {
-    badges: ["warm", "sweet", "date-night", "luxury-feel"],
-    meters: { freshness: 2, sweetness: 4, warmth: 4, projection: 4, longevity: 4 },
-    vibes: ["sweet-warm", "date-night", "luxury-feel"],
-    occasions: ["date-night", "party", "gift"],
-    budgetBands: ["40-60", "premium-picks"],
-    bestFor: "Sunset florals that feel dressed up, not loud.",
-  },
-  dreamweaver: {
-    badges: ["sweet", "warm", "date-night", "gift-pick"],
-    meters: { freshness: 2, sweetness: 4, warmth: 4, projection: 3, longevity: 4 },
-    vibes: ["sweet-warm", "date-night", "dark-mysterious"],
-    occasions: ["date-night", "party", "casual-everyday"],
-    budgetBands: ["20-40", "40-60"],
-    bestFor: "Soft musk-gourmand for close-distance evenings.",
-  },
-  "j-mystery": {
-    badges: ["warm", "luxury-feel", "date-night", "best-seller"],
-    meters: { freshness: 2, sweetness: 3, warmth: 5, projection: 5, longevity: 5 },
-    vibes: ["dark-mysterious", "luxury-feel", "date-night"],
-    occasions: ["date-night", "party", "signature-scent"],
-    budgetBands: ["40-60", "premium-picks"],
-    bestFor: "After-dark depth when you want the room to notice.",
-  },
-  "la-mer": {
-    badges: ["fresh", "daily-wear", "gift-pick", "long-lasting"],
-    meters: { freshness: 5, sweetness: 1, warmth: 2, projection: 2, longevity: 3 },
-    vibes: ["fresh-clean", "everyday-wear"],
-    occasions: ["school-work", "vacation", "casual-everyday"],
-    budgetBands: ["20-40", "40-60"],
-    bestFor: "Sheer coastal minimal — effortless and clean.",
-  },
-  "lush-milk": {
-    badges: ["sweet", "daily-wear", "gift-pick", "fresh"],
-    meters: { freshness: 3, sweetness: 3, warmth: 3, projection: 2, longevity: 3 },
-    vibes: ["sweet-warm", "everyday-wear", "fresh-clean"],
-    occasions: ["casual-everyday", "gift", "school-work"],
-    budgetBands: ["20-40", "40-60"],
-    bestFor: "Skin-close comfort that reads soft, not sugary.",
-  },
-  reverie: {
-    badges: ["fresh", "daily-wear", "gift-pick", "sweet"],
-    meters: { freshness: 3, sweetness: 3, warmth: 3, projection: 3, longevity: 3 },
-    vibes: ["fresh-clean", "everyday-wear", "luxury-feel"],
-    occasions: ["school-work", "casual-everyday", "gift"],
-    budgetBands: ["20-40", "40-60"],
-    bestFor: "Powdery florals with a modern, lifted finish.",
-  },
-  "sweet-marshmallow": {
-    badges: ["sweet", "warm", "date-night", "gift-pick"],
-    meters: { freshness: 2, sweetness: 5, warmth: 4, projection: 4, longevity: 4 },
-    vibes: ["sweet-warm", "date-night"],
-    occasions: ["date-night", "party", "gift"],
-    budgetBands: ["20-40", "40-60"],
-    bestFor: "Playful gourmand warmth for nights out.",
-  },
-  "tobacco-vanilla": {
-    badges: ["warm", "sweet", "date-night", "long-lasting"],
-    meters: { freshness: 1, sweetness: 3, warmth: 5, projection: 4, longevity: 5 },
-    vibes: ["dark-mysterious", "sweet-warm", "date-night"],
-    occasions: ["date-night", "party", "signature-scent"],
-    budgetBands: ["40-60", "premium-picks"],
-    bestFor: "Resinous evening warmth with serious staying power.",
-  },
-  "valencia-cashmere": {
-    badges: ["fresh", "daily-wear", "best-seller", "gift-pick"],
-    meters: { freshness: 4, sweetness: 2, warmth: 3, projection: 3, longevity: 3 },
-    vibes: ["fresh-clean", "everyday-wear", "luxury-feel", "date-night"],
-    occasions: ["school-work", "casual-everyday", "date-night", "gift"],
-    budgetBands: ["20-40", "40-60", "best-value"],
-    bestFor: "Radiant citrus-woods that works from desk to dinner.",
-  },
-  visionary: {
-    badges: ["fresh", "luxury-feel", "daily-wear", "long-lasting"],
-    meters: { freshness: 4, sweetness: 2, warmth: 3, projection: 3, longevity: 4 },
-    vibes: ["fresh-clean", "luxury-feel", "everyday-wear"],
-    occasions: ["school-work", "signature-scent", "casual-everyday"],
-    budgetBands: ["40-60", "premium-picks"],
-    bestFor: "Cool green aromatics — refined and quietly confident.",
-  },
-} as const satisfies Record<string, ProductUxMeta>;
-
-export const productUxByHandle: Record<string, ProductUxMeta> = M;
+/** Optional overrides — most ALLURA 7 products use `fallbackUx` from catalog profiles. */
+export const productUxByHandle: Record<string, ProductUxMeta> = {};
 
 function clampMeter(n: number): number {
   return Math.min(5, Math.max(1, Math.round(n)));
@@ -134,7 +28,11 @@ function fallbackUx(product: Product): ProductUxMeta {
     vibes: [],
     occasions: [],
     budgetBands: [],
-    bestFor: product.tagline ?? product.subtitle ?? "A versatile pick from the catalog.",
+    bestFor:
+      product.tagline ??
+      product.subtitle ??
+      product.description.slice(0, 120) +
+        (product.description.length > 120 ? "…" : ""),
   };
 }
 
@@ -148,7 +46,6 @@ export function minVariantPriceCents(product: Product): number {
   return Math.min(...product.variants.map((v) => v.priceCents));
 }
 
-/** Budget URL segments → product matches via `budgetBands` or price rules. */
 export function productMatchesBudgetBand(
   product: Product,
   band: string,
@@ -162,9 +59,9 @@ export function productMatchesBudgetBand(
   if (band === "under-20") return d < 20;
   if (band === "20-40") return d >= 20 && d < 40;
   if (band === "40-60") return d >= 40 && d <= 60;
-  if (band === "premium-picks") return d > 60 || ux.badges.includes("luxury-feel");
+  if (band === "premium-picks") return d > 60 || Boolean(product.isSignature);
   if (band === "best-value")
-    return ux.budgetBands.includes("best-value") || ux.badges.includes("budget-pick");
+    return ux.budgetBands.includes("best-value") || Boolean(product.isBestSeller);
 
   return false;
 }
@@ -177,7 +74,6 @@ export function productMatchesOccasion(product: Product, occasion: string): bool
   return getProductUx(product).occasions.includes(occasion);
 }
 
-/** Gift guide deep links — `?gift=` on /shop */
 export function productMatchesGiftGuide(product: Product, gift: string): boolean {
   const ux = getProductUx(product);
   const min = minVariantPriceCents(product);
@@ -186,6 +82,7 @@ export function productMatchesGiftGuide(product: Product, gift: string): boolean
     product.description,
     ...ux.badges,
     ...ux.vibes,
+    product.primaryCategory,
   ]
     .join(" ")
     .toLowerCase();
@@ -193,28 +90,34 @@ export function productMatchesGiftGuide(product: Product, gift: string): boolean
   switch (gift) {
     case "safe-blind-buys":
       return (
-        ux.badges.includes("gift-pick") &&
-        (ux.badges.includes("fresh") || ux.badges.includes("daily-wear"))
+        product.primaryCategory === "gift-sets" ||
+        Boolean(product.isBestSeller) ||
+        hay.includes("clean")
       );
     case "under-40":
       return min < 4000;
     case "fresh-scents":
-      return ux.badges.includes("fresh") || ux.vibes.includes("fresh-clean");
+      return Boolean(product.scentFamilies?.includes("fresh"));
     case "sweet-scents":
-      return ux.badges.includes("sweet") || ux.vibes.includes("sweet-warm");
+      return Boolean(product.scentFamilies?.includes("sweet"));
     case "luxury":
-      return ux.badges.includes("luxury-feel") || min >= 6000;
+      return Boolean(product.scentFamilies?.includes("luxury")) || min >= 6000;
     default:
       return false;
   }
 }
 
-/** Up to `max` badges (target 2–4 in product data). */
 export function pickCardBadges(product: Product, max = 4): ShoppingBadgeId[] {
   const ux = getProductUx(product);
-  const list = [...ux.badges];
-  if (product.featured && !list.includes("best-seller")) {
+  const list: ShoppingBadgeId[] = [...ux.badges];
+  if (product.isBestSeller && !list.includes("best-seller")) {
     list.unshift("best-seller");
+  }
+  if (product.isSignature && !list.includes("luxury-feel")) {
+    list.push("luxury-feel");
+  }
+  if (product.limitedEdition && !list.includes("date-night")) {
+    list.push("date-night");
   }
   return list.slice(0, max);
 }
@@ -235,7 +138,7 @@ export function quizExplainMatch(
     bits.push("fresh profile");
   if (answers.vibe === "warm" && ux.meters.warmth >= 4)
     bits.push("warmth in the dry-down");
-  if (answers.vibe === "gourmand" && ux.badges.includes("sweet"))
+  if (answers.vibe === "gourmand" && ux.meters.sweetness >= 4)
     bits.push("sweeter side of the catalog");
   if (answers.vibe === "spiced" && ux.meters.warmth >= 4)
     bits.push("depth for spiced moods");
@@ -247,7 +150,7 @@ export function quizExplainMatch(
     bits.push("fits a value budget");
   if (answers.budget === "splurge" && minVariantPriceCents(product) >= 5500)
     bits.push("room for a splurge-tier pick");
-  if (answers.occasion === "evening" && ux.badges.includes("date-night"))
+  if (answers.occasion === "evening" && product.profile.intensity >= 4)
     bits.push("evening-ready character");
   if (answers.season === "warm" && ux.meters.freshness >= 4)
     bits.push("heat-friendly lift");

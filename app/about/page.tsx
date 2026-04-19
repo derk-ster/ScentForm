@@ -5,7 +5,7 @@ import { Reveal } from "@/components/ui/Reveal";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "What Scentform stands for — materials, clarity, and wearability.",
+  description: "What ALLURA 7 stands for — materials, clarity, and luxury wearability.",
 };
 
 export default function AboutPage() {
@@ -15,15 +15,15 @@ export default function AboutPage() {
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
           Brand
         </p>
-        <h1 className="mt-2 font-display text-4xl">Built for the way people wear scent now</h1>
+        <h1 className="mt-2 font-display text-4xl">ALLURA 7 — luxury you can navigate</h1>
       </Reveal>
       <div className="mt-8 space-y-4 text-sm leading-relaxed text-muted-foreground">
         <Reveal delay={0.05}>
           <p>
-            Scentform is a modern fragrance house focused on clarity: what is in
-            the bottle, how it performs on skin and fabric, and which concentration
-            fits your day. We would rather under-promise and over-deliver than
-            decorate a label with vague mystique.
+            ALLURA 7 is a modern luxury fragrance and home-scent house focused on
+            clarity: what is in the bottle or vessel, how it performs on skin and in
+            a room, and how each piece fits a real routine. We prefer honest detail
+            and confident restraint over vague mystique.
           </p>
         </Reveal>
         <Reveal delay={0.1}>

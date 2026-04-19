@@ -7,7 +7,7 @@ import { ConcentrationMatcher } from "@/components/concentration/ConcentrationMa
 export const metadata: Metadata = {
   title: "Concentrations",
   description:
-    "Learn how EDT, EDP, Extrait, and perfume oils wear — then shop each concentration across Scentform lines.",
+    "Learn how EDT, EDP, Extrait, and perfume oils wear — then explore how ALLURA 7 personal fragrances map to each wear level.",
 };
 
 export default function ConcentrationsIndexPage() {

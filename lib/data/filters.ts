@@ -1,4 +1,9 @@
-import type { ConcentrationHandle, Product } from "@/types/catalog";
+import type {
+  PrimaryCategoryHandle,
+  Product,
+  ProductGender,
+  ScentFamilyTag,
+} from "@/types/catalog";
 import {
   productMatchesBudgetBand,
   productMatchesGiftGuide,
@@ -9,7 +14,7 @@ import {
 export type ShopFilters = {
   mood?: string | null;
   note?: string | null;
-  concentration?: ConcentrationHandle | null;
+  category?: PrimaryCategoryHandle | null;
   collection?: string | null;
   q?: string | null;
   sort?: "featured" | "price-asc" | "price-desc" | "alpha";
@@ -17,6 +22,9 @@ export type ShopFilters = {
   budget?: string | null;
   occasion?: string | null;
   gift?: string | null;
+  gender?: ProductGender | null;
+  scentFamily?: ScentFamilyTag | null;
+  curated?: "new" | "bestseller" | null;
 };
 
 function matchesMood(product: Product, mood: string) {
@@ -61,7 +69,8 @@ function matchesNote(product: Product, note: string) {
       notes.includes("cedar") ||
       notes.includes("sandal") ||
       notes.includes("guaiac") ||
-      notes.includes("vetiver")
+      notes.includes("vetiver") ||
+      notes.includes("oud")
     );
   if (n === "vanilla")
     return notes.includes("vanilla") || notes.includes("tonka") || notes.includes("resin");
@@ -69,10 +78,25 @@ function matchesNote(product: Product, note: string) {
     return (
       notes.includes("marine") ||
       notes.includes("salt") ||
-      product.title.toLowerCase().includes("mer") ||
-      product.title.toLowerCase().includes("marine")
+      notes.includes("sea") ||
+      product.title.toLowerCase().includes("ocean") ||
+      product.title.toLowerCase().includes("coastal")
     );
   return notes.includes(n);
+}
+
+function matchesGender(product: Product, gender: ProductGender): boolean {
+  if (product.primaryCategory !== "perfumes-colognes") return true;
+  const g = product.gender;
+  if (!g) return true;
+  if (gender === "unisex") return g === "unisex";
+  if (gender === "men") return g === "men" || g === "unisex";
+  if (gender === "women") return g === "women" || g === "unisex";
+  return false;
+}
+
+function matchesScentFamily(product: Product, family: ScentFamilyTag): boolean {
+  return Boolean(product.scentFamilies?.includes(family));
 }
 
 export function filterProducts(products: Product[], filters: ShopFilters) {
@@ -82,10 +106,24 @@ export function filterProducts(products: Product[], filters: ShopFilters) {
     out = out.filter((p) => p.collectionHandle === filters.collection);
   }
 
-  if (filters.concentration) {
-    out = out.filter((p) =>
-      p.variants.some((v) => v.concentration === filters.concentration),
-    );
+  if (filters.category) {
+    out = out.filter((p) => p.primaryCategory === filters.category);
+  }
+
+  if (filters.gender) {
+    const gender = filters.gender;
+    out = out.filter((p) => matchesGender(p, gender));
+  }
+
+  if (filters.scentFamily) {
+    const family = filters.scentFamily;
+    out = out.filter((p) => matchesScentFamily(p, family));
+  }
+
+  if (filters.curated === "new") {
+    out = out.filter((p) => p.isNew);
+  } else if (filters.curated === "bestseller") {
+    out = out.filter((p) => p.isBestSeller);
   }
 
   if (filters.mood) {
@@ -124,7 +162,11 @@ export function filterProducts(products: Product[], filters: ShopFilters) {
       const blob = [
         p.title,
         p.collectionTitle,
+        p.categoryTitle,
+        p.productTypeLabel,
         p.description,
+        p.gender,
+        ...(p.scentFamilies ?? []),
         ...p.profile.mood,
         ...p.notes.top,
         ...p.notes.heart,
@@ -151,7 +193,14 @@ export function filterProducts(products: Product[], filters: ShopFilters) {
   } else if (filters.sort === "alpha") {
     out.sort((a, b) => a.title.localeCompare(b.title));
   } else {
-    out.sort((a, b) => Number(b.featured) - Number(a.featured));
+    out.sort((a, b) => {
+      const score = (p: Product) =>
+        Number(p.isBestSeller) * 4 +
+        Number(p.isSignature) * 3 +
+        Number(p.featured) * 2 +
+        Number(p.isNew);
+      return score(b) - score(a);
+    });
   }
 
   return out;

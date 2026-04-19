@@ -3,7 +3,7 @@ import { ContactForm } from "@/components/contact/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Contact Scentform support for orders, products, and partnerships.",
+  description: "Contact ALLURA 7 support for orders, products, and partnerships.",
 };
 
 export default function ContactPage() {

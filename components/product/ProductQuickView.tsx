@@ -63,7 +63,9 @@ export function ProductQuickView({ product, open, onOpenChange }: Props) {
                 Quick view for {product.title}. {product.description.slice(0, 160)}
               </DialogDescription>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                {product.collectionTitle}
+                {product.productTypeLabel}
+                <span className="mx-1.5 opacity-50">·</span>
+                {product.categoryTitle}
               </p>
               <DialogTitle className="font-display text-xl leading-snug sm:text-2xl">
                 {product.title}
@@ -82,11 +84,15 @@ export function ProductQuickView({ product, open, onOpenChange }: Props) {
               </p>
               <p className="mt-1 text-sm text-foreground">{ux.bestFor}</p>
             </div>
-            <ScentMeterBars meters={ux.meters} compact />
+            {product.listingKind === "fragrance" ? (
+              <ScentMeterBars meters={ux.meters} compact />
+            ) : null}
             {sizeOptions.length > 0 ? (
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Popular sizes
+                  {product.listingKind === "lifestyle"
+                    ? "Options"
+                    : "Popular sizes"}
                 </p>
                 <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground">
                   {sizeOptions.map((v) => (

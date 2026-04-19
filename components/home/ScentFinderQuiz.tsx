@@ -7,9 +7,14 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, Check, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/Reveal";
-import { getCatalog, getDefaultVariant } from "@/lib/data/catalog";
+import {
+  getCatalog,
+  getDefaultVariant,
+  getProductsForHomeScent,
+  getNewArrivals,
+} from "@/lib/data/catalog";
 import { formatMoney } from "@/lib/utils/money";
-import type { Product, ProductVariant } from "@/types/catalog";
+import type { PrimaryCategoryHandle, Product, ProductVariant } from "@/types/catalog";
 import { useCartStore } from "@/store/cart-store";
 import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
 import {
@@ -20,81 +25,104 @@ import {
 } from "@/lib/data/product-ux";
 import { ProductBadges } from "@/components/product/ProductBadges";
 
-type VibeAnswer = "clean" | "warm" | "spiced" | "gourmand";
-type BoldAnswer = "subtle" | "statement";
+type ShopForAnswer = "body" | "home" | "gift" | "new";
+type MoodAnswer = "clean" | "warm" | "spiced" | "gourmand";
+type PresenceAnswer = "soft" | "balanced" | "bold";
 type BudgetAnswer = "value" | "core" | "splurge";
-type OccasionAnswer = "daily" | "evening" | "special";
-type SeasonAnswer = "warm" | "cool";
+type PriorityAnswer = "everyday" | "evening" | "statement" | "surprise";
 
-type Answers = {
-  vibe: VibeAnswer;
-  bold: BoldAnswer;
+export type DiscoveryAnswers = {
+  shopFor: ShopForAnswer;
+  mood: MoodAnswer;
+  presence: PresenceAnswer;
   budget: BudgetAnswer;
-  occasion: OccasionAnswer;
-  season: SeasonAnswer;
+  priority: PriorityAnswer;
 };
 
-type Question = {
-  id: keyof Answers;
+type DiscoveryStepId = keyof DiscoveryAnswers;
+
+const STEP_ORDER: DiscoveryStepId[] = [
+  "shopFor",
+  "mood",
+  "presence",
+  "budget",
+  "priority",
+];
+
+type StepDef = {
+  id: DiscoveryStepId;
   title: string;
   subtitle: string;
-  options: { label: string; caption?: string; value: Answers[keyof Answers] }[];
-  columns?: 2 | 3 | 4;
+  columns: 2 | 3 | 4;
+  options: {
+    label: string;
+    caption?: string;
+    value:
+      | ShopForAnswer
+      | MoodAnswer
+      | PresenceAnswer
+      | BudgetAnswer
+      | PriorityAnswer;
+  }[];
 };
 
-const questions: Question[] = [
+const DISCOVERY_STEPS: StepDef[] = [
   {
-    id: "vibe",
-    title: "Pick a mood",
-    subtitle: "Which direction sounds right today?",
+    id: "shopFor",
+    title: "What are you shopping for?",
+    subtitle: "We’ll tune the next four questions to this lane.",
     columns: 2,
     options: [
-      { label: "Clean", caption: "Citrus, airy", value: "clean" },
-      { label: "Warm", caption: "Amber, woods", value: "warm" },
-      { label: "Spiced", caption: "Tobacco, pepper", value: "spiced" },
-      { label: "Gourmand", caption: "Vanilla, sweet", value: "gourmand" },
+      { label: "For your body", caption: "Fragrance & care", value: "body" },
+      { label: "For your home", caption: "Mist, wax, incense, diffusers", value: "home" },
+      { label: "For a gift", caption: "Mix of categories", value: "gift" },
+      { label: "Something new", caption: "Arrivals & highlights", value: "new" },
     ],
   },
   {
-    id: "bold",
-    title: "How loud do you wear it?",
-    subtitle: "Signature projection.",
+    id: "mood",
+    title: "Which mood fits best?",
+    subtitle: "Skin, space, or gift — same directional language.",
     columns: 2,
     options: [
-      { label: "Soft", caption: "Skin scent", value: "subtle" },
-      { label: "Bold", caption: "Leaves a trail", value: "statement" },
+      { label: "Clean & crisp", caption: "Citrus, air, lift", value: "clean" },
+      { label: "Warm & resinous", caption: "Amber, woods, wrap", value: "warm" },
+      { label: "Spiced & textured", caption: "Pepper, tea, smoke", value: "spiced" },
+      { label: "Soft gourmand", caption: "Vanilla, fig, comfort", value: "gourmand" },
+    ],
+  },
+  {
+    id: "presence",
+    title: "How much presence do you want?",
+    subtitle: "Close to skin, balanced, or fills the room.",
+    columns: 3,
+    options: [
+      { label: "Soft & close", caption: "Intimate radius", value: "soft" },
+      { label: "Balanced", caption: "Clear but polite", value: "balanced" },
+      { label: "Bold", caption: "Statement throw", value: "bold" },
     ],
   },
   {
     id: "budget",
     title: "Budget comfort zone",
-    subtitle: "We'll price-match your pick.",
+    subtitle: "We’ll keep the trio near this lane.",
     columns: 3,
     options: [
-      { label: "Under $40", caption: "Smart pick", value: "value" },
-      { label: "$40 – $60", caption: "Everyday core", value: "core" },
-      { label: "$60+", caption: "Splurge", value: "splurge" },
+      { label: "Under $40", caption: "Smart tests", value: "value" },
+      { label: "$40 – $60", caption: "Core buys", value: "core" },
+      { label: "$60+", caption: "Room for splurge", value: "splurge" },
     ],
   },
   {
-    id: "occasion",
-    title: "When will you wear it most?",
-    subtitle: "We'll tune for the moment.",
-    columns: 3,
-    options: [
-      { label: "Daily", caption: "Work, errands", value: "daily" },
-      { label: "Evening", caption: "Dinner, dates", value: "evening" },
-      { label: "Special", caption: "Events, nights out", value: "special" },
-    ],
-  },
-  {
-    id: "season",
-    title: "Season you're dressing for",
-    subtitle: "Same fragrance wears differently in heat.",
+    id: "priority",
+    title: "What matters most right now?",
+    subtitle: "One last nudge before we show three picks.",
     columns: 2,
     options: [
-      { label: "Warm weather", caption: "Spring / summer", value: "warm" },
-      { label: "Cool weather", caption: "Fall / winter", value: "cool" },
+      { label: "Everyday rhythm", caption: "Reach-for staples", value: "everyday" },
+      { label: "After hours", caption: "Evenings & occasions", value: "evening" },
+      { label: "Statement & space", caption: "Presence in the room", value: "statement" },
+      { label: "Surprise me", caption: "Newness & editor energy", value: "surprise" },
     ],
   },
 ];
@@ -108,58 +136,134 @@ function budgetMatchesCents(budget: BudgetAnswer, cents: number) {
 
 type Scored = { p: Product; score: number; ref: ProductVariant };
 
-function scoreCatalog(answers: Answers): Scored[] {
-  const catalog = getCatalog();
-  const scored = catalog.map((p) => {
-    let score = 0;
-    const hay = [
-      ...p.notes.top,
-      ...p.notes.heart,
-      ...p.notes.base,
-      p.title,
-    ]
-      .join(" ")
-      .toLowerCase();
-
-    if (answers.vibe === "clean" && p.profile.freshness >= 4) score += 3;
-    if (answers.vibe === "warm" && p.profile.warmth >= 4) score += 3;
-    if (
-      answers.vibe === "spiced" &&
-      /tobacco|pepper|cinnamon|ginger|saffron|leather/.test(hay)
-    )
-      score += 3;
-    if (
-      answers.vibe === "gourmand" &&
-      /vanilla|tonka|marshmallow|caramel|milk/.test(hay)
-    )
-      score += 3;
-
-    if (answers.bold === "subtle" && p.profile.intensity <= 3) score += 2;
-    if (answers.bold === "statement" && p.profile.intensity >= 4) score += 2;
-
-    const ref = getDefaultVariant(p);
-    if (budgetMatchesCents(answers.budget, ref.priceCents)) score += 2;
-
-    if (answers.occasion === "daily" && p.profile.intensity <= 3) score += 1;
-    if (answers.occasion === "evening" && p.profile.intensity >= 3) score += 1;
-    if (answers.occasion === "special" && p.profile.intensity >= 4) score += 2;
-
-    if (answers.season === "warm" && p.profile.freshness >= 4) score += 1;
-    if (answers.season === "cool" && p.profile.warmth >= 4) score += 1;
-
-    return { p, score, ref };
-  });
-  scored.sort((a, b) => b.score - a.score);
-  return scored;
+function personalCatalog(): Product[] {
+  return getCatalog().filter(
+    (p) =>
+      p.primaryCategory === "perfumes-colognes" ||
+      p.primaryCategory === "body",
+  );
 }
 
-/** Three slots: best scoring match, value lane, premium lane — tweak scoring in scoreCatalog only. */
-function pickQuizTriple(answers: Answers): {
+const HOME_PRIMARY: PrimaryCategoryHandle[] = [
+  "home",
+  "incense",
+  "diffuser-machines",
+  "diffuser-oils",
+];
+
+function poolFor(a: DiscoveryAnswers): Product[] {
+  switch (a.shopFor) {
+    case "body":
+      return personalCatalog();
+    case "home":
+      return getProductsForHomeScent();
+    case "gift":
+      return getCatalog().filter((p) => p.giftable);
+    case "new":
+      return dedupeProducts([
+        ...getNewArrivals(),
+        ...getCatalog().filter((p) => p.featured),
+      ]);
+    default:
+      return getCatalog();
+  }
+}
+
+function dedupeProducts(products: Product[]): Product[] {
+  const seen = new Set<string>();
+  const out: Product[] = [];
+  for (const p of products) {
+    if (seen.has(p.handle)) continue;
+    seen.add(p.handle);
+    out.push(p);
+  }
+  return out;
+}
+
+function scoreDiscovery(a: DiscoveryAnswers): Scored[] {
+  const pool = poolFor(a);
+  return pool
+    .map((p) => {
+      let score = 0;
+      const hay = [
+        ...p.notes.top,
+        ...p.notes.heart,
+        ...p.notes.base,
+        p.title,
+        p.description,
+      ]
+        .join(" ")
+        .toLowerCase();
+      const ux = getProductUx(p);
+
+      if (a.mood === "clean" && p.profile.freshness >= 4) score += 3;
+      if (a.mood === "warm" && p.profile.warmth >= 4) score += 3;
+      if (
+        a.mood === "spiced" &&
+        /tobacco|pepper|cinnamon|ginger|saffron|leather|smoke|resin/.test(hay)
+      )
+        score += 3;
+      if (
+        a.mood === "gourmand" &&
+        /vanilla|tonka|marshmallow|caramel|milk|fig|sweet/.test(hay)
+      )
+        score += 3;
+
+      if (a.presence === "soft" && p.profile.intensity <= 3) score += 2;
+      if (
+        a.presence === "balanced" &&
+        p.profile.intensity >= 2 &&
+        p.profile.intensity <= 4
+      )
+        score += 2;
+      if (a.presence === "bold" && p.profile.intensity >= 4) score += 3;
+
+      const ref = getDefaultVariant(p);
+      if (budgetMatchesCents(a.budget, ref.priceCents)) score += 2;
+
+      if (a.priority === "everyday") {
+        if (
+          ux.occasions.includes("casual-everyday") ||
+          ux.occasions.includes("school-work")
+        )
+          score += 2;
+        if (p.profile.intensity <= 3) score += 1;
+      }
+      if (a.priority === "evening") {
+        if (ux.badges.includes("date-night") || ux.occasions.includes("date-night"))
+          score += 2;
+        if (p.profile.intensity >= 3) score += 1;
+      }
+      if (a.priority === "statement") {
+        if (p.profile.intensity >= 4) score += 2;
+        if (
+          HOME_PRIMARY.includes(p.primaryCategory) &&
+          (p.primaryCategory === "diffuser-machines" ||
+            p.primaryCategory === "incense" ||
+            p.productTypeLabel.toLowerCase().includes("candle"))
+        )
+          score += 2;
+        if (ux.badges.includes("luxury-feel")) score += 1;
+      }
+      if (a.priority === "surprise") {
+        if (p.isNew) score += 3;
+        if (p.featured) score += 1;
+      }
+
+      if (a.shopFor === "gift" && ux.badges.includes("gift-pick")) score += 1;
+      if (a.shopFor === "new" && (p.isNew || p.featured)) score += 1;
+
+      return { p, score, ref };
+    })
+    .sort((a, b) => b.score - a.score);
+}
+
+function pickTripleFromPool(sorted: Scored[]): {
   best: Scored;
   budgetPick: Scored;
   premiumPick: Scored;
 } | null {
-  const scored = scoreCatalog(answers);
+  const scored = sorted;
   const best = scored[0];
   if (!best) return null;
 
@@ -197,19 +301,53 @@ function pickQuizTriple(answers: Answers): {
   return { best, budgetPick, premiumPick };
 }
 
+function pickDiscoveryTriple(a: DiscoveryAnswers) {
+  return pickTripleFromPool(scoreDiscovery(a));
+}
+
+function firstMissingIndex(answers: Partial<DiscoveryAnswers>): number {
+  for (let i = 0; i < STEP_ORDER.length; i += 1) {
+    const k = STEP_ORDER[i];
+    if (answers[k] === undefined) return i;
+  }
+  return STEP_ORDER.length;
+}
+
+function discoveryCaption(entry: Scored, a: DiscoveryAnswers): string {
+  if (a.shopFor === "body") {
+    return quizExplainMatch(entry.p, {
+      vibe: a.mood,
+      bold: a.presence === "bold" ? "statement" : "subtle",
+      budget: a.budget,
+      occasion: a.priority === "evening" ? "evening" : "daily",
+      season: "warm",
+    });
+  }
+
+  const ux = getProductUx(entry.p);
+  const pLabel =
+    a.priority === "everyday"
+      ? "Everyday"
+      : a.priority === "evening"
+        ? "After hours"
+        : a.priority === "statement"
+          ? "Statement"
+          : "Fresh mix";
+  return `${pLabel} · ${ux.bestFor}`;
+}
+
 function QuizResultCard({
   label,
   entry,
-  answers,
+  why,
 }: {
   label: string;
   entry: Scored;
-  answers: Answers;
+  why: string;
 }) {
   const { playFrom } = useCartFly();
   const reduceMotion = useReducedMotion();
   const addLine = useCartStore((s) => s.addLine);
-  const why = quizExplainMatch(entry.p, answers);
   const badges = pickCardBadges(entry.p, 3);
 
   return (
@@ -239,6 +377,9 @@ function QuizResultCard({
           </p>
           <ProductBadges badges={badges} />
           <p className="text-[11px] leading-relaxed text-muted-foreground">{why}</p>
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground/80">
+            {entry.p.productTypeLabel} · {entry.p.categoryTitle}
+          </p>
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -266,68 +407,66 @@ function QuizResultCard({
 }
 
 export function ScentFinderQuiz() {
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Partial<Answers>>({});
+  const [answers, setAnswers] = useState<Partial<DiscoveryAnswers>>({});
 
-  const complete = questions.every((q) => answers[q.id] !== undefined);
+  const idx = firstMissingIndex(answers);
+  const complete = STEP_ORDER.every((k) => answers[k] !== undefined);
+  const current = idx < DISCOVERY_STEPS.length ? DISCOVERY_STEPS[idx] : null;
+
   const triple = useMemo(() => {
     if (!complete) return null;
     try {
-      return pickQuizTriple(answers as Answers);
+      return pickDiscoveryTriple(answers as DiscoveryAnswers);
     } catch {
       return null;
     }
   }, [answers, complete]);
 
-  const safeStep = Math.min(
-    Math.max(0, step),
-    Math.max(0, questions.length - 1),
-  );
-  const q = questions[safeStep];
+  const progressPct = complete ? 100 : Math.round((idx / STEP_ORDER.length) * 100);
+
   const colsClass =
-    q?.columns === 4
+    current?.columns === 4
       ? "grid-cols-2 sm:grid-cols-4"
-      : q?.columns === 3
+      : current?.columns === 3
         ? "grid-cols-1 sm:grid-cols-3"
         : "grid-cols-2";
 
-  const progressPct = Math.round(
-    (Object.keys(answers).length / questions.length) * 100,
-  );
+  const reset = () => setAnswers({});
 
-  const handlePick = (value: Answers[keyof Answers]) => {
-    if (!q) return;
+  const goBack = () => {
     setAnswers((prev) => {
-      const next = { ...prev, [q.id]: value } as Partial<Answers>;
+      const next = { ...prev };
+      for (let i = STEP_ORDER.length - 1; i >= 0; i -= 1) {
+        const k = STEP_ORDER[i];
+        if (next[k] !== undefined) {
+          delete next[k];
+          return next;
+        }
+      }
       return next;
     });
-    setStep((s) => Math.min(s + 1, questions.length - 1));
   };
 
-  const goBack = () => setStep((s) => Math.max(0, s - 1));
-  const reset = () => {
-    setAnswers({});
-    setStep(0);
-  };
+  const fullAnswers = answers as DiscoveryAnswers;
 
   return (
     <section
       id="scent-finder"
-      className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8"
+      className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8"
     >
       <Reveal className="overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-card/60 via-card/30 to-background/20 p-6 shadow-lg sm:p-10">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-sm">
             <p className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Sparkles className="h-3 w-3 text-primary" />
-              Quick match
+              Discovery guide
             </p>
             <h2 className="mt-4 font-display text-3xl sm:text-4xl">
-              Five taps. Three picks.
+              Five questions. Three picks.
             </h2>
             <p className="mt-3 text-sm text-muted-foreground">
-              Tell us your mood, budget, and when you&apos;ll wear it — we&apos;ll suggest a
-              best match, a budget-friendly option, and a richer premium pick.
+              Body, home, gifts, or newness first — then mood, presence, budget, and
+              priority. Same premium match logic, one straight line.
             </p>
           </div>
 
@@ -336,7 +475,7 @@ export function ScentFinderQuiz() {
               <div className="mb-4">
                 <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                   <span>
-                    {triple ? "Your lineup" : `${step + 1} / ${questions.length}`}
+                    {triple ? "Your lineup" : `Question ${Math.min(idx + 1, 5)} / 5`}
                   </span>
                   <span>{progressPct}%</span>
                 </div>
@@ -344,70 +483,105 @@ export function ScentFinderQuiz() {
                   <motion.div
                     className="h-full rounded-full bg-primary"
                     initial={false}
-                    animate={{ width: `${triple ? 100 : progressPct}%` }}
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    animate={{ width: `${progressPct}%` }}
+                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                   />
                 </div>
               </div>
 
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="wait" initial={false}>
                 {complete && !triple ? (
                   <motion.div
                     key="no-triple"
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={false}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
                     className="rounded-xl border border-border/60 bg-background/40 p-4 text-sm text-muted-foreground"
                   >
                     We couldn&apos;t build picks from the catalog just now. Please refresh
                     the page or try again later.
                   </motion.div>
-                ) : !triple && q ? (
+                ) : triple && complete ? (
                   <motion.div
-                    key={q.id + step}
-                    initial={{ opacity: 0, x: 16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -16 }}
-                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    key="result"
+                    initial={false}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="space-y-4"
                   >
-                    <p className="font-display text-lg">{q.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {q.subtitle}
-                    </p>
-                    <div className={`mt-4 grid gap-2 ${colsClass}`}>
-                      {q.options.map((opt) => {
-                        const selected = answers[q.id] === opt.value;
-                        return (
-                          <button
-                            key={opt.value as string}
-                            type="button"
-                            onClick={() => handlePick(opt.value)}
-                            className={`group flex flex-col items-start rounded-xl border px-3 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/60 hover:bg-background/80 ${
-                              selected
-                                ? "border-primary bg-primary/10"
-                                : "border-border/60 bg-background/40"
-                            }`}
-                          >
-                            <span className="text-sm font-medium text-foreground">
-                              {opt.label}
-                            </span>
-                            {opt.caption ? (
-                              <span className="mt-0.5 text-[11px] text-muted-foreground">
-                                {opt.caption}
-                              </span>
-                            ) : null}
-                          </button>
-                        );
-                      })}
+                    <div className="flex items-center gap-2 text-xs text-primary">
+                      <Check className="h-3.5 w-3.5" />
+                      Curated from your five answers
                     </div>
-
+                    <QuizResultCard
+                      label="Best match"
+                      entry={triple.best}
+                      why={discoveryCaption(triple.best, fullAnswers)}
+                    />
+                    <QuizResultCard
+                      label="Budget pick"
+                      entry={triple.budgetPick}
+                      why={discoveryCaption(triple.budgetPick, fullAnswers)}
+                    />
+                    <QuizResultCard
+                      label="Premium option"
+                      entry={triple.premiumPick}
+                      why={discoveryCaption(triple.premiumPick, fullAnswers)}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={reset}
+                    >
+                      <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                      Start over
+                    </Button>
+                  </motion.div>
+                ) : current ? (
+                  <motion.div
+                    key={current.id}
+                    initial={false}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <p className="font-display text-lg">{current.title}</p>
+                    <p className="text-xs text-muted-foreground">{current.subtitle}</p>
+                    <div className={`mt-4 grid gap-2 ${colsClass}`}>
+                      {current.options.map((opt) => (
+                        <button
+                          key={String(opt.value)}
+                          type="button"
+                          onClick={() => {
+                            setAnswers((prev) => ({
+                              ...prev,
+                              [current.id]: opt.value,
+                            }));
+                          }}
+                          className="group flex flex-col items-start rounded-xl border border-border/60 bg-background/40 px-3 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/60 hover:bg-background/80"
+                        >
+                          <span className="text-sm font-medium text-foreground">
+                            {opt.label}
+                          </span>
+                          {opt.caption ? (
+                            <span className="mt-0.5 text-[11px] text-muted-foreground">
+                              {opt.caption}
+                            </span>
+                          ) : null}
+                        </button>
+                      ))}
+                    </div>
                     <div className="mt-4 flex items-center justify-between">
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={goBack}
-                        disabled={step === 0}
+                        disabled={idx === 0 && Object.keys(answers).length === 0}
                         className="h-8 px-2 text-xs disabled:opacity-40"
                       >
                         <ArrowLeft className="mr-1 h-3.5 w-3.5" />
@@ -424,45 +598,6 @@ export function ScentFinderQuiz() {
                         Reset
                       </Button>
                     </div>
-                  </motion.div>
-                ) : triple ? (
-                  <motion.div
-                    key="result"
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                    className="space-y-4"
-                  >
-                    <div className="flex items-center gap-2 text-xs text-primary">
-                      <Check className="h-3.5 w-3.5" />
-                      Curated from your answers
-                    </div>
-                    <QuizResultCard
-                      label="Best match"
-                      entry={triple.best}
-                      answers={answers as Answers}
-                    />
-                    <QuizResultCard
-                      label="Budget pick"
-                      entry={triple.budgetPick}
-                      answers={answers as Answers}
-                    />
-                    <QuizResultCard
-                      label="Premium / stronger pick"
-                      entry={triple.premiumPick}
-                      answers={answers as Answers}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={reset}
-                    >
-                      <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-                      Retake quiz
-                    </Button>
                   </motion.div>
                 ) : null}
               </AnimatePresence>

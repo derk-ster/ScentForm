@@ -4,7 +4,7 @@ import { getNewArrivals } from "@/lib/data/catalog";
 
 export const metadata: Metadata = {
   title: "New arrivals",
-  description: "The newest Scentform releases and restocks.",
+  description: "The newest ALLURA 7 releases and restocks across the catalog.",
 };
 
 export default function NewArrivalsPage() {

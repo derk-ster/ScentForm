@@ -47,8 +47,8 @@ export function ShopByBudgetSection() {
         </p>
         <h2 className="mt-2 font-display text-2xl sm:text-3xl">Shop by budget</h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Choose a lane first — we&apos;ll show fragrances that fit, without digging
-          through filters.
+          Choose a lane first — we&apos;ll match personal fragrance and lifestyle SKUs
+          that fit, without opening a wall of filters.
         </p>
       </Reveal>
       <motion.div

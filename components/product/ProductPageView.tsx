@@ -31,6 +31,7 @@ function variantsForConcentration(product: Product, c: ConcentrationHandle) {
 }
 
 export function ProductPageView({ product }: Props) {
+  const isLifestyle = product.listingKind === "lifestyle";
   const { playFrom } = useCartFly();
   const reduceMotion = useReducedMotion();
   const addLine = useCartStore((s) => s.addLine);
@@ -79,7 +80,7 @@ export function ProductPageView({ product }: Props) {
   const activeImage = product.images[imageIndex] ?? product.images[0];
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-28 pt-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 pb-14 pt-10 sm:px-6 sm:pb-16 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
         <div>
           <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/40">
@@ -126,7 +127,15 @@ export function ProductPageView({ product }: Props) {
         <div className="lg:sticky lg:top-24">
           <div className="rounded-3xl border border-border/70 bg-card/40 p-6 sm:p-8">
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              {product.collectionTitle}
+              {product.productTypeLabel}
+              <span className="mx-2 text-border">·</span>
+              {product.categoryTitle}
+              {product.brand ? (
+                <>
+                  <span className="mx-2 text-border">·</span>
+                  {product.brand}
+                </>
+              ) : null}
             </p>
             <h1 className="mt-2 font-display text-4xl">{product.title}</h1>
             {product.tagline ? (
@@ -140,6 +149,7 @@ export function ProductPageView({ product }: Props) {
             </p>
 
             {(() => {
+              if (isLifestyle) return null;
               const dupe = getSmellsLike(product.handle);
               if (!dupe) return null;
               return (
@@ -158,7 +168,7 @@ export function ProductPageView({ product }: Props) {
                     </span>
                   </p>
                   <p className="mt-1.5 text-[10px] text-muted-foreground/70">
-                    Scent resemblance only — Scentform is not affiliated with{" "}
+                    Scent resemblance only — ALLURA 7 is not affiliated with{" "}
                     {dupe.brand}.
                   </p>
                 </div>
@@ -166,50 +176,54 @@ export function ProductPageView({ product }: Props) {
             })()}
 
             <div className="mt-8 space-y-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-                  Concentration
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {concentrations.map((c) => {
-                    const exists = product.variants.some(
-                      (v) => v.concentration === c.handle,
-                    );
-                    if (!exists) return null;
-                    return (
+              {!isLifestyle ? (
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                    Concentration
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {concentrations.map((c) => {
+                      const exists = product.variants.some(
+                        (v) => v.concentration === c.handle,
+                      );
+                      if (!exists) return null;
+                      return (
+                        <Button
+                          key={c.handle}
+                          type="button"
+                          size="sm"
+                          variant={
+                            concentration === c.handle ? "default" : "outline"
+                          }
+                          onClick={() => setConcentration(c.handle)}
+                        >
+                          {c.shortLabel}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+              {sizes.length > 1 ? (
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                    {isLifestyle ? "Choose an option" : "Size"}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {sizes.map((v) => (
                       <Button
-                        key={c.handle}
+                        key={v.id}
                         type="button"
                         size="sm"
-                        variant={
-                          concentration === c.handle ? "default" : "outline"
-                        }
-                        onClick={() => setConcentration(c.handle)}
+                        variant={variant.id === v.id ? "default" : "outline"}
+                        onClick={() => setVariant(v)}
                       >
-                        {c.shortLabel}
+                        {v.sizeLabel}
                       </Button>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-                  Size
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {sizes.map((v) => (
-                    <Button
-                      key={v.id}
-                      type="button"
-                      size="sm"
-                      variant={variant.id === v.id ? "default" : "outline"}
-                      onClick={() => setVariant(v)}
-                    >
-                      {v.sizeLabel}
-                    </Button>
-                  ))}
-                </div>
-              </div>
+              ) : null}
             </div>
 
             <div className="mt-8 flex items-end justify-between gap-4">
@@ -284,32 +298,46 @@ export function ProductPageView({ product }: Props) {
       </div>
 
       <section className="mt-14 space-y-4">
-        <h2 className="font-display text-2xl">Notes</h2>
+        <h2 className="font-display text-2xl">
+          {isLifestyle ? "Character notes" : "Notes"}
+        </h2>
         <NotePyramid notes={product.notes} />
       </section>
 
       <section className="mt-14 grid gap-8 lg:grid-cols-2">
         <div>
-          <h2 className="font-display text-2xl">Profile</h2>
+          <h2 className="font-display text-2xl">
+            {isLifestyle ? "At a glance" : "Profile"}
+          </h2>
           <div className="mt-6">
-            <ScentProfileMeters profile={product.profile} />
+            {isLifestyle ? (
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {product.subtitle ?? product.tagline ?? product.description}
+              </p>
+            ) : (
+              <ScentProfileMeters profile={product.profile} />
+            )}
           </div>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {product.profile.occasions.map((o) => (
-              <span
-                key={o}
-                className="rounded-full border border-border/60 bg-background/40 px-3 py-1 text-xs text-muted-foreground"
-              >
-                {o}
-              </span>
-            ))}
-          </div>
+          {!isLifestyle ? (
+            <div className="mt-6 flex flex-wrap gap-2">
+              {product.profile.occasions.map((o) => (
+                <span
+                  key={o}
+                  className="rounded-full border border-border/60 bg-background/40 px-3 py-1 text-xs text-muted-foreground"
+                >
+                  {o}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
         <div className="rounded-3xl border border-border/70 bg-card/40 p-6">
           <h3 className="font-display text-2xl">Specifications</h3>
           <dl className="mt-4 space-y-3 text-sm">
             <div className="flex justify-between gap-6 border-b border-border/40 pb-3">
-              <dt className="text-muted-foreground">Concentration</dt>
+              <dt className="text-muted-foreground">
+                {isLifestyle ? "Format" : "Concentration"}
+              </dt>
               <dd>{variant.concentrationLabel}</dd>
             </div>
             <div className="flex justify-between gap-6 border-b border-border/40 pb-3">
@@ -392,37 +420,6 @@ export function ProductPageView({ product }: Props) {
         alt={`${product.title} enlarged`}
         title={`${product.title} image`}
       />
-
-      <motion.div
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border/70 bg-background/95 p-4 backdrop-blur lg:hidden"
-        initial={{ y: 80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.35 }}
-      >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
-          <div>
-            <p className="text-xs text-muted-foreground">Total</p>
-            <p className="font-display text-xl">
-              {formatMoney(variant.priceCents * qty, variant.currencyCode)}
-            </p>
-          </div>
-          <motion.div
-            className="flex-1"
-            whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-          >
-            <Button
-              type="button"
-              className="w-full rounded-full"
-              onClick={(e) => {
-                playFrom(e.currentTarget);
-                addLine({ product, variant, quantity: qty });
-              }}
-            >
-              Add to cart
-            </Button>
-          </motion.div>
-        </div>
-      </motion.div>
     </div>
   );
 }

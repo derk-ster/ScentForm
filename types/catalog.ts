@@ -1,5 +1,29 @@
 export type ConcentrationHandle = "edt" | "edp" | "extrait" | "perfume-oil";
 
+/** Top-level shop categories — homepage cards and `/categories/[slug]`. */
+export type PrimaryCategoryHandle =
+  | "home"
+  | "body"
+  | "perfumes-colognes"
+  | "incense"
+  | "diffuser-machines"
+  | "diffuser-oils"
+  | "gift-sets";
+
+/** PDP / shop filters — personal fragrances only when set. */
+export type ProductGender = "men" | "women" | "unisex";
+
+/** Merchandising filters — perfumes carry full set; others may omit. */
+export type ScentFamilyTag =
+  | "fresh"
+  | "woody"
+  | "sweet"
+  | "floral"
+  | "luxury";
+
+/** Fragrance PDPs keep concentration + profile; lifestyle SKUs use simpler cards/PDP chrome. */
+export type ProductListingKind = "fragrance" | "lifestyle";
+
 export type ConcentrationMeta = {
   handle: ConcentrationHandle;
   label: string;
@@ -76,6 +100,15 @@ export type Product = {
   subtitle?: string;
   collectionHandle: string;
   collectionTitle: string;
+  /** Browse pillar — shown on cards and filters. */
+  primaryCategory: PrimaryCategoryHandle;
+  /** Short label for product kind (e.g. “Ultrasonic diffuser”, “Eau de Parfum”). */
+  productTypeLabel: string;
+  /** Mirrors primary category display title for quick scanning. */
+  categoryTitle: string;
+  listingKind: ProductListingKind;
+  /** Optional house or partner brand — omit when it adds noise. */
+  brand?: string;
   description: string;
   tagline?: string;
   notes: NotePyramid;
@@ -87,6 +120,14 @@ export type Product = {
   hoverImage?: string;
   featured?: boolean;
   isNew?: boolean;
+  /** Curated high-velocity picks for rails and filters. */
+  isBestSeller?: boolean;
+  /** House icons — shown on cards when set. */
+  isSignature?: boolean;
+  limitedEdition?: boolean;
+  gender?: ProductGender;
+  /** Fresh / woody / sweet / floral / luxury — shop filters. */
+  scentFamilies?: ScentFamilyTag[];
   giftable?: boolean;
   hasTravelSizes?: boolean;
   relatedHandles?: string[];
