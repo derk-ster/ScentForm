@@ -10,6 +10,7 @@ import {
   productMatchesOccasion,
   productMatchesVibe,
 } from "@/lib/data/product-ux";
+import { slugifyProductTypeLabel } from "@/lib/shop/product-type-options";
 
 export type ShopFilters = {
   mood?: string | null;
@@ -22,8 +23,18 @@ export type ShopFilters = {
   budget?: string | null;
   occasion?: string | null;
   gift?: string | null;
+  /** Legacy single-select URL (`gender=`) */
   gender?: ProductGender | null;
+  /** Legacy single-select URL (`family=`) */
   scentFamily?: ScentFamilyTag | null;
+  /** Multi-select (`genders=men,women`) */
+  genders?: ProductGender[] | null;
+  /** Multi-select (`families=fresh,woody`) */
+  families?: ScentFamilyTag[] | null;
+  /** Multi-select (`prices=under-40,40-80`) */
+  priceBands?: string[] | null;
+  /** Product format / concentration labels (`ptype=body-lotion,eau-de-parfum`) */
+  productTypeSlugs?: string[] | null;
   curated?: "new" | "bestseller" | null;
 };
 
@@ -95,8 +106,40 @@ function matchesGender(product: Product, gender: ProductGender): boolean {
   return false;
 }
 
+/** Tags used for “smells like” filtering — explicit families or profile inference. */
+export function getProductSmellFamilies(product: Product): ScentFamilyTag[] {
+  if (product.scentFamilies?.length) return product.scentFamilies;
+  const { freshness, sweetness, warmth } = product.profile;
+  const tags = new Set<ScentFamilyTag>();
+  if (freshness >= 4) tags.add("fresh");
+  if (sweetness >= 4) tags.add("sweet");
+  if (warmth >= 4) tags.add("woody");
+  if (freshness <= 2 && sweetness >= 3 && warmth <= 3) tags.add("floral");
+  const min = Math.min(...product.variants.map((v) => v.priceCents));
+  if (min >= 6000 || product.isSignature) tags.add("luxury");
+  if (!tags.size) {
+    const max = Math.max(freshness, sweetness, warmth);
+    if (max === freshness) tags.add("fresh");
+    else if (max === sweetness) tags.add("sweet");
+    else tags.add("woody");
+  }
+  return Array.from(tags);
+}
+
 function matchesScentFamily(product: Product, family: ScentFamilyTag): boolean {
-  return Boolean(product.scentFamilies?.includes(family));
+  return getProductSmellFamilies(product).includes(family);
+}
+
+function minVariantPriceCents(product: Product): number {
+  return Math.min(...product.variants.map((v) => v.priceCents));
+}
+
+function matchesPriceBand(product: Product, band: string): boolean {
+  const m = minVariantPriceCents(product);
+  if (band === "under-40") return m < 4000;
+  if (band === "40-80") return m >= 4000 && m < 8000;
+  if (band === "80-plus") return m >= 8000;
+  return false;
 }
 
 export function filterProducts(products: Product[], filters: ShopFilters) {
@@ -106,18 +149,40 @@ export function filterProducts(products: Product[], filters: ShopFilters) {
     out = out.filter((p) => p.collectionHandle === filters.collection);
   }
 
+  if (filters.productTypeSlugs?.length) {
+    const wanted = new Set(filters.productTypeSlugs);
+    out = out.filter((p) =>
+      wanted.has(slugifyProductTypeLabel(p.productTypeLabel)),
+    );
+  }
+
   if (filters.category) {
     out = out.filter((p) => p.primaryCategory === filters.category);
   }
 
-  if (filters.gender) {
-    const gender = filters.gender;
-    out = out.filter((p) => matchesGender(p, gender));
+  const genderList: ProductGender[] | null =
+    filters.genders && filters.genders.length > 0
+      ? filters.genders
+      : filters.gender
+        ? [filters.gender]
+        : null;
+  if (genderList?.length) {
+    out = out.filter((p) => genderList.some((g) => matchesGender(p, g)));
   }
 
-  if (filters.scentFamily) {
-    const family = filters.scentFamily;
-    out = out.filter((p) => matchesScentFamily(p, family));
+  const familyList: ScentFamilyTag[] | null =
+    filters.families && filters.families.length > 0
+      ? filters.families
+      : filters.scentFamily
+        ? [filters.scentFamily]
+        : null;
+  if (familyList?.length) {
+    out = out.filter((p) => familyList.some((f) => matchesScentFamily(p, f)));
+  }
+
+  if (filters.priceBands?.length) {
+    const bands = filters.priceBands;
+    out = out.filter((p) => bands.some((b) => matchesPriceBand(p, b)));
   }
 
   if (filters.curated === "new") {

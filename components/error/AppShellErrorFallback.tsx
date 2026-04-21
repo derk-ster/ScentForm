@@ -1,12 +1,14 @@
+import { Allura7Wordmark } from "@/components/brand/Allura7Wordmark";
+
 /**
  * No hooks, no context — safe when the rest of the client tree failed.
  */
 export function AppShellErrorFallback() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-16 text-center text-foreground">
-      <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
-        ALLURA 7
-      </p>
+      <div className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
+        <Allura7Wordmark className="text-xs uppercase tracking-[0.28em] text-muted-foreground hover:text-foreground" />
+      </div>
       <h1 className="mt-4 max-w-md font-display text-3xl sm:text-4xl">
         Something broke while loading this page
       </h1>

@@ -9,7 +9,8 @@ export function HeroSection() {
   return (
     <section className="relative -mt-16 overflow-hidden pb-16 pt-24 sm:pb-20 sm:pt-28">
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-muted/20" />
-      <div className="pointer-events-none absolute inset-0 opacity-40">
+      {/* Same two glow orbs in light and dark — original placement */}
+      <div className="pointer-events-none absolute inset-0 opacity-40" aria-hidden>
         <div className="absolute -left-24 top-0 h-[420px] w-[420px] rounded-full bg-primary/15 blur-3xl" />
         <div className="absolute -right-32 bottom-0 h-[380px] w-[380px] rounded-full bg-violet-500/10 blur-3xl" />
       </div>

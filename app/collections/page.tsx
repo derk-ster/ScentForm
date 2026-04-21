@@ -4,16 +4,23 @@ import Image from "next/image";
 import { collections } from "@/lib/data/collections";
 
 export const metadata: Metadata = {
-  title: "Collections",
+  title: "Shop lines",
   description:
-    "Browse ALLURA 7 collections — personal fragrance, body, home, incense, diffusers, and gifts.",
+    "Browse ALLURA 7 shop lines — thematic edits (personal, body, home, incense, diffusers, gifts). For product types (lotion, eau de parfum, etc.), use Shop filters.",
 };
 
 export default function CollectionsIndexPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="flex items-end justify-between gap-4">
-        <h1 className="font-display text-3xl">Collections</h1>
+      <div className="max-w-2xl">
+        <h1 className="font-display text-3xl">Shop lines</h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Thematic edits and capsule worlds — not the same as{" "}
+          <Link href="/shop" className="text-primary underline-offset-2 hover:underline">
+            product types
+          </Link>{" "}
+          (format and concentration) in the shop sidebar.
+        </p>
       </div>
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {collections.map((c) => (

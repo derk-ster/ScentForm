@@ -166,10 +166,21 @@ export function ProductPageView({ product }: Props) {
               active={infoBoxInView}
             />
             <div className="relative z-[2]">
-            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              {product.productTypeLabel}
+            <p className="text-xs font-medium leading-relaxed text-muted-foreground">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/85">
+                Category
+              </span>{" "}
+              <span className="text-foreground/90">{product.categoryTitle}</span>
               <span className="mx-2 text-border">·</span>
-              {product.categoryTitle}
+              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/85">
+                Type
+              </span>{" "}
+              <span className="text-foreground/90">{product.productTypeLabel}</span>
+              <span className="mx-2 text-border">·</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/85">
+                Shop line
+              </span>{" "}
+              <span className="text-foreground/90">{product.collectionTitle}</span>
               {product.brand ? (
                 <>
                   <span className="mx-2 text-border">·</span>

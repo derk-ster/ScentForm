@@ -59,8 +59,15 @@ export function SearchPageClient() {
         </div>
         <div>
           <h2 className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
-            Collections
+            Shop lines
           </h2>
+          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+            Thematic edits — for lotions, EDPs, candles, use{" "}
+            <Link href="/shop" className="text-primary underline-offset-2 hover:underline">
+              Shop → Product type
+            </Link>
+            .
+          </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {collectionMatches.map((c) => (
               <Link

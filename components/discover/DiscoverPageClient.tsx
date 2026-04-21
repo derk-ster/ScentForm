@@ -7,6 +7,7 @@ import type { PrimaryCategoryHandle, Product } from "@/types/catalog";
 import { Button } from "@/components/ui/button";
 import { ContextMatchQuiz } from "@/components/shop/ContextMatchQuiz";
 import { DiscoverProductMarquee } from "@/components/discover/DiscoverProductMarquee";
+import { Allura7Wordmark } from "@/components/brand/Allura7Wordmark";
 
 type Props = {
   spotlightProducts: Product[];
@@ -67,9 +68,9 @@ export function DiscoverPageClient({
     <div className="pb-20">
       <header className="border-b border-border/50 bg-card/20">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            ALLURA 7
-          </p>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+            <Allura7Wordmark className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground hover:text-foreground" />
+          </div>
           <h1 className="mt-2 font-display text-4xl sm:text-5xl">Discovery guide</h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             Three quick match flows for body, home, and colognes & perfumes — each tuned to

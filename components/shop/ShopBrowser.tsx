@@ -1,16 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SlidersHorizontal } from "lucide-react";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { collections } from "@/lib/data/collections";
 import { getCatalog } from "@/lib/data/catalog";
-import { isPrimaryCategoryHandle, shopCategories } from "@/lib/data/categories";
-import type { ProductGender, ScentFamilyTag } from "@/types/catalog";
-import { filterProducts, type ShopFilters } from "@/lib/data/filters";
+import { shopCategories } from "@/lib/data/categories";
+import { filterProducts } from "@/lib/data/filters";
 import {
   Dialog,
   DialogContent,
@@ -18,68 +17,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { groupProductsByTypeLabel } from "@/lib/shop/group-products";
+import { parseShopFiltersFromSearchParams } from "@/lib/shop/shop-url-filters";
+import { getCatalogProductTypeFilterOptions } from "@/lib/shop/product-type-options";
 import { ContextMatchQuiz } from "@/components/shop/ContextMatchQuiz";
-
-const SCENT_FAMILIES: { value: ScentFamilyTag; label: string }[] = [
-  { value: "fresh", label: "Fresh" },
-  { value: "woody", label: "Woody" },
-  { value: "sweet", label: "Sweet" },
-  { value: "floral", label: "Floral" },
-  { value: "luxury", label: "Luxury" },
-];
-
-const GENDERS: { value: ProductGender; label: string }[] = [
-  { value: "men", label: "Men" },
-  { value: "women", label: "Women" },
-  { value: "unisex", label: "Unisex" },
-];
-
-function parseFilters(searchParams: URLSearchParams): ShopFilters {
-  const mood = searchParams.get("mood");
-  const note = searchParams.get("note");
-  const collection = searchParams.get("collection");
-  const q = searchParams.get("q");
-  const sort = (searchParams.get("sort") as ShopFilters["sort"]) || "featured";
-  const vibe = searchParams.get("vibe");
-  const budget = searchParams.get("budget");
-  const occasion = searchParams.get("occasion");
-  const gift = searchParams.get("gift");
-  const categoryRaw = searchParams.get("category");
-  const category =
-    categoryRaw && isPrimaryCategoryHandle(categoryRaw) ? categoryRaw : null;
-  const genderRaw = searchParams.get("gender") as ProductGender | null;
-  const gender =
-    genderRaw === "men" || genderRaw === "women" || genderRaw === "unisex"
-      ? genderRaw
-      : null;
-  const familyRaw = searchParams.get("family") as ScentFamilyTag | null;
-  const scentFamily =
-    familyRaw === "fresh" ||
-    familyRaw === "woody" ||
-    familyRaw === "sweet" ||
-    familyRaw === "floral" ||
-    familyRaw === "luxury"
-      ? familyRaw
-      : null;
-  const curatedRaw = searchParams.get("curated");
-  const curated =
-    curatedRaw === "new" || curatedRaw === "bestseller" ? curatedRaw : null;
-  return {
-    mood,
-    note,
-    category,
-    collection,
-    q,
-    sort: sort ?? "featured",
-    vibe,
-    budget,
-    occasion,
-    gift,
-    gender,
-    scentFamily,
-    curated,
-  };
-}
+import { ShopRefineCheckboxes } from "@/components/shop/ShopRefineCheckboxes";
+import { cn } from "@/lib/utils/cn";
 
 export function ShopBrowser() {
   const router = useRouter();
@@ -88,7 +30,7 @@ export function ShopBrowser() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const filters = useMemo(
-    () => parseFilters(searchParams),
+    () => parseShopFiltersFromSearchParams(searchParams),
     [searchParams],
   );
 
@@ -101,6 +43,21 @@ export function ShopBrowser() {
     return groupProductsByTypeLabel(products, filters.category);
   }, [products, filters.category]);
 
+  const productTypeOptions = useMemo(
+    () => getCatalogProductTypeFilterOptions(),
+    [],
+  );
+
+  const ptypeSelection = useMemo(() => {
+    const raw = searchParams.get("ptype");
+    return new Set(
+      raw
+        ?.split(",")
+        .map((s) => s.trim())
+        .filter(Boolean) ?? [],
+    );
+  }, [searchParams]);
+
   const setParam = (key: string, value: string | null) => {
     const next = new URLSearchParams(searchParams.toString());
     if (!value) next.delete(key);
@@ -108,25 +65,60 @@ export function ShopBrowser() {
     router.push(`${pathname}?${next.toString()}`);
   };
 
+  const togglePtype = useCallback(
+    (slug: string) => {
+      const next = new URLSearchParams(searchParams.toString());
+      const cur = new Set(
+        (next.get("ptype") ?? "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+      );
+      if (cur.has(slug)) cur.delete(slug);
+      else cur.add(slug);
+      if (cur.size === 0) next.delete("ptype");
+      else next.set("ptype", Array.from(cur).sort().join(","));
+      router.push(`${pathname}?${next.toString()}`);
+    },
+    [pathname, router, searchParams],
+  );
+
+  const resetAllFilters = useCallback(() => {
+    router.push(pathname);
+  }, [pathname, router]);
+
+  const filterLinkClass = (active: boolean) =>
+    cn(
+      "block w-full rounded-lg border px-3 py-2 text-left text-sm transition",
+      active
+        ? "border-primary/55 bg-primary/12 font-medium text-foreground shadow-sm"
+        : "border-transparent text-muted-foreground hover:border-border/70 hover:bg-muted/40 hover:text-foreground",
+    );
+
+  const hasAnyShopFilters = searchParams.toString().length > 0;
+
   const filterSections = (
     <>
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
           Category
         </p>
-        <div className="mt-3 space-y-2">
+        <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
+          Where it lives in the store — body, home, personal scent, and more.
+        </p>
+        <div className="mt-3 space-y-1.5">
           <button
             type="button"
-            className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
+            className={filterLinkClass(!filters.category)}
             onClick={() => setParam("category", null)}
           >
-            All
+            All categories
           </button>
           {shopCategories.map((c) => (
             <button
               key={c.handle}
               type="button"
-              className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
+              className={filterLinkClass(filters.category === c.handle)}
               onClick={() => setParam("category", c.handle)}
             >
               {c.title}
@@ -136,24 +128,38 @@ export function ShopBrowser() {
       </div>
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Collection
+          Product type
         </p>
-        <div className="mt-3 space-y-2">
+        <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
+          Format and concentration — eau de parfum, body lotion, candle, etc.
+          (Not the same as{" "}
+          <a
+            href="/collections"
+            className="font-medium text-primary underline-offset-2 hover:underline"
+          >
+            shop lines
+          </a>
+          .)
+        </p>
+        <div className="mt-3 max-h-64 space-y-1.5 overflow-y-auto pr-1">
           <button
             type="button"
-            className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
-            onClick={() => setParam("collection", null)}
+            className={filterLinkClass(ptypeSelection.size === 0)}
+            onClick={() => setParam("ptype", null)}
           >
-            All
+            All types
           </button>
-          {collections.map((c) => (
+          {productTypeOptions.map((o) => (
             <button
-              key={c.handle}
+              key={o.slug}
               type="button"
-              className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
-              onClick={() => setParam("collection", c.handle)}
+              className={filterLinkClass(ptypeSelection.has(o.slug))}
+              onClick={() => togglePtype(o.slug)}
             >
-              {c.title}
+              <span className="block">{o.label}</span>
+              <span className="mt-0.5 block text-[10px] font-normal text-muted-foreground">
+                {o.count} {o.count === 1 ? "SKU" : "SKUs"}
+              </span>
             </button>
           ))}
         </div>
@@ -162,24 +168,24 @@ export function ShopBrowser() {
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
           Spotlight
         </p>
-        <div className="mt-3 space-y-2">
+        <div className="mt-3 space-y-1.5">
           <button
             type="button"
-            className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
+            className={filterLinkClass(!filters.curated)}
             onClick={() => setParam("curated", null)}
           >
             All products
           </button>
           <button
             type="button"
-            className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
+            className={filterLinkClass(filters.curated === "new")}
             onClick={() => setParam("curated", "new")}
           >
             New arrivals
           </button>
           <button
             type="button"
-            className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
+            className={filterLinkClass(filters.curated === "bestseller")}
             onClick={() => setParam("curated", "bestseller")}
           >
             Best sellers
@@ -187,62 +193,16 @@ export function ShopBrowser() {
         </div>
       </div>
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Gender
-        </p>
-        <p className="mt-1 text-[10px] text-muted-foreground/80">
-          Narrows personal fragrance; body & home stay visible.
-        </p>
-        <div className="mt-3 space-y-2">
-          <button
-            type="button"
-            className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
-            onClick={() => setParam("gender", null)}
-          >
-            Any
-          </button>
-          {GENDERS.map((g) => (
-            <button
-              key={g.value}
-              type="button"
-              className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
-              onClick={() => setParam("gender", g.value)}
-            >
-              {g.label}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Scent family
-        </p>
-        <div className="mt-3 space-y-2">
-          <button
-            type="button"
-            className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
-            onClick={() => setParam("family", null)}
-          >
-            Any
-          </button>
-          {SCENT_FAMILIES.map((f) => (
-            <button
-              key={f.value}
-              type="button"
-              className="block w-full text-left text-sm text-muted-foreground hover:text-foreground"
-              onClick={() => setParam("family", f.value)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div>
         <Label className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
           Sort
         </Label>
         <select
-          className="mt-3 w-full rounded-md border border-border/80 bg-card/60 px-3 py-2 text-sm"
+          className={cn(
+            "mt-3 w-full rounded-md border bg-card/60 px-3 py-2 text-sm transition",
+            filters.sort && filters.sort !== "featured"
+              ? "border-primary/50 ring-1 ring-primary/20"
+              : "border-border/80",
+          )}
           value={filters.sort ?? "featured"}
           onChange={(e) => setParam("sort", e.target.value)}
         >
@@ -252,14 +212,26 @@ export function ShopBrowser() {
           <option value="alpha">Alphabetically, A–Z</option>
         </select>
       </div>
+      <ShopRefineCheckboxes searchParams={searchParams} pathname={pathname} />
     </>
   );
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-6 lg:flex-row">
-          <aside className="hidden w-64 shrink-0 lg:block">
+        <aside className="hidden w-72 shrink-0 lg:block">
           <div className="sticky top-24 space-y-8">
+            {hasAnyShopFilters ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full border-dashed"
+                onClick={resetAllFilters}
+              >
+                Reset all filters
+              </Button>
+            ) : null}
             {filterSections}
             {products.length > 0 ? (
               <div className="border-t border-border/50 pt-6">
@@ -297,15 +269,28 @@ export function ShopBrowser() {
                 ) : null}
               </p>
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              className="lg:hidden"
-              onClick={() => setMobileFiltersOpen(true)}
-            >
-              <SlidersHorizontal className="mr-2 h-4 w-4" />
-              Filters
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              {hasAnyShopFilters ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="hidden border-dashed sm:inline-flex"
+                  onClick={resetAllFilters}
+                >
+                  Reset all
+                </Button>
+              ) : null}
+              <Button
+                type="button"
+                variant="outline"
+                className="lg:hidden"
+                onClick={() => setMobileFiltersOpen(true)}
+              >
+                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                Filters
+              </Button>
+            </div>
           </div>
 
           {products.length === 0 ? (
@@ -314,12 +299,8 @@ export function ShopBrowser() {
               <p className="mt-2 text-sm text-muted-foreground">
                 Clear filters or reset to browse the full ALLURA 7 catalog.
               </p>
-              <Button
-                type="button"
-                className="mt-6"
-                onClick={() => router.push(pathname)}
-              >
-                Reset filters
+              <Button type="button" className="mt-6" onClick={resetAllFilters}>
+                Reset all filters
               </Button>
             </div>
           ) : groupedSections ? (
@@ -361,6 +342,20 @@ export function ShopBrowser() {
             <DialogTitle>Filters</DialogTitle>
           </DialogHeader>
           <div className="space-y-8">
+            {hasAnyShopFilters ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full border-dashed"
+                onClick={() => {
+                  resetAllFilters();
+                  setMobileFiltersOpen(false);
+                }}
+              >
+                Reset all filters
+              </Button>
+            ) : null}
             {filterSections}
             {products.length > 0 ? (
               <div className="border-t border-border/50 pt-4">

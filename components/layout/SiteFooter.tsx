@@ -4,6 +4,7 @@ import { collections } from "@/lib/data/collections";
 import { policyLinks } from "@/lib/data/policies";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Allura7Wordmark } from "@/components/brand/Allura7Wordmark";
 
 function TikTokIcon({ className }: { className?: string }) {
   return (
@@ -27,7 +28,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-sm">
-            <p className="font-display text-xl tracking-[0.12em]">ALLURA 7</p>
+            <Allura7Wordmark className="text-xl" />
             <p className="mt-2 text-sm text-muted-foreground">
               Luxury fragrance lifestyle — skin, space, and air.
             </p>
@@ -80,7 +81,7 @@ export function SiteFooter() {
                     href="/collections"
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    Collections
+                    Shop lines
                   </Link>
                 </li>
               </ul>

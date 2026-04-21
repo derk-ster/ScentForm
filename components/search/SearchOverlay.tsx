@@ -87,7 +87,7 @@ export function SearchOverlay({ open, onOpenChange }: Props) {
                   >
                     <span className="font-medium">{p.title}</span>
                     <span className="ml-2 text-xs text-muted-foreground">
-                      {p.collectionTitle}
+                      {p.productTypeLabel} · {p.collectionTitle}
                     </span>
                   </Link>
                 ))
@@ -96,7 +96,7 @@ export function SearchOverlay({ open, onOpenChange }: Props) {
           </div>
           <div>
             <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              Collections
+              Shop lines
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {collectionMatches.map((c) => (

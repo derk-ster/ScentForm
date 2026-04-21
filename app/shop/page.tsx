@@ -5,7 +5,7 @@ import { ShopBrowser } from "@/components/shop/ShopBrowser";
 export const metadata: Metadata = {
   title: "Shop",
   description:
-    "Browse the full ALLURA 7 catalog — filter by category, collection, scent family, gender, new arrivals, best sellers, and price.",
+    "Browse the full ALLURA 7 catalog — filter by category, product type (format), scent, gender, spotlight, and price. Shop lines (thematic edits) live under Shop lines in the nav.",
 };
 
 export default function ShopPage() {

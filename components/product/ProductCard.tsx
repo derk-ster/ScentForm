@@ -135,11 +135,17 @@ export function ProductCard({ product, className }: Props) {
             </Button>
           </div>
         </div>
-        <div className="space-y-2 px-4 pb-2 pt-4">
-          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-            <span className="text-foreground/90">{product.productTypeLabel}</span>
-            <span className="mx-1.5 text-border">·</span>
-            {product.categoryTitle}
+        <div className="space-y-2.5 px-4 pb-2 pt-4">
+          <p className="text-[10px] font-medium leading-relaxed text-muted-foreground">
+            <span className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground/85">
+              Category
+            </span>
+            <span className="ml-1 text-foreground/90">{product.categoryTitle}</span>
+            <span className="mx-2 text-border">·</span>
+            <span className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground/85">
+              Type
+            </span>
+            <span className="ml-1 text-foreground/90">{product.productTypeLabel}</span>
           </p>
           <Link
             href={`/products/${product.handle}`}

@@ -49,8 +49,14 @@ function buildShopHref(filters: ShopFilters): string {
   const p = new URLSearchParams();
   if (filters.category) p.set("category", filters.category);
   if (filters.collection) p.set("collection", filters.collection);
-  if (filters.gender) p.set("gender", filters.gender);
-  if (filters.scentFamily) p.set("family", filters.scentFamily);
+  if (filters.genders?.length) p.set("genders", filters.genders.sort().join(","));
+  else if (filters.gender) p.set("gender", filters.gender);
+  if (filters.families?.length) p.set("families", filters.families.sort().join(","));
+  else if (filters.scentFamily) p.set("family", filters.scentFamily);
+  if (filters.priceBands?.length)
+    p.set("prices", [...filters.priceBands].sort().join(","));
+  if (filters.productTypeSlugs?.length)
+    p.set("ptype", [...filters.productTypeSlugs].sort().join(","));
   if (filters.mood) p.set("mood", filters.mood);
   if (filters.note) p.set("note", filters.note);
   if (filters.budget) p.set("budget", filters.budget);

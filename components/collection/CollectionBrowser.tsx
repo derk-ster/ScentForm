@@ -1,35 +1,30 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SlidersHorizontal } from "lucide-react";
 import Image from "next/image";
-import type { Collection } from "@/types/catalog";
+import type { Collection, PrimaryCategoryHandle } from "@/types/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { getProductsByCollection, getSkuCountForCollection } from "@/lib/data/catalog";
-import { filterProducts, type ShopFilters } from "@/lib/data/filters";
+import { filterProducts } from "@/lib/data/filters";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { PrimaryCategoryHandle } from "@/types/catalog";
 import { groupProductsByTypeLabel } from "@/lib/shop/group-products";
+import { parseShopFiltersFromSearchParams } from "@/lib/shop/shop-url-filters";
 import { ContextMatchQuiz } from "@/components/shop/ContextMatchQuiz";
+import { ShopRefineCheckboxes } from "@/components/shop/ShopRefineCheckboxes";
+import { cn } from "@/lib/utils/cn";
 
 type Props = {
   collection: Collection;
 };
-
-function parseFilters(searchParams: URLSearchParams): ShopFilters {
-  const sort = (searchParams.get("sort") as ShopFilters["sort"]) || "featured";
-  return {
-    sort: sort ?? "featured",
-  };
-}
 
 export function CollectionBrowser({ collection }: Props) {
   const router = useRouter();
@@ -38,7 +33,10 @@ export function CollectionBrowser({ collection }: Props) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const filters = useMemo(
-    () => ({ ...parseFilters(searchParams), collection: collection.handle }),
+    () => ({
+      ...parseShopFiltersFromSearchParams(searchParams),
+      collection: collection.handle,
+    }),
     [searchParams, collection.handle],
   );
 
@@ -78,22 +76,47 @@ export function CollectionBrowser({ collection }: Props) {
     router.push(qs ? `${pathname}?${qs}` : pathname);
   };
 
-  const sortControl = (
-    <div>
-      <Label className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-        Sort
-      </Label>
-      <select
-        className="mt-3 w-full rounded-md border border-border/80 bg-card/60 px-3 py-2 text-sm"
-        value={filters.sort ?? "featured"}
-        onChange={(e) => setParam("sort", e.target.value)}
-      >
-        <option value="featured">Featured</option>
-        <option value="price-asc">Price, low to high</option>
-        <option value="price-desc">Price, high to low</option>
-        <option value="alpha">Alphabetically, A–Z</option>
-      </select>
-    </div>
+  const resetQueryFilters = useCallback(() => {
+    router.push(pathname);
+  }, [pathname, router]);
+
+  const hasQueryFilters = searchParams.toString().length > 0;
+
+  const sidebarFilters = (
+    <>
+      {hasQueryFilters ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="w-full border-dashed"
+          onClick={resetQueryFilters}
+        >
+          Reset all filters
+        </Button>
+      ) : null}
+      <div>
+        <Label className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+          Sort
+        </Label>
+        <select
+          className={cn(
+            "mt-3 w-full rounded-md border bg-card/60 px-3 py-2 text-sm transition",
+            filters.sort && filters.sort !== "featured"
+              ? "border-primary/50 ring-1 ring-primary/20"
+              : "border-border/80",
+          )}
+          value={filters.sort ?? "featured"}
+          onChange={(e) => setParam("sort", e.target.value)}
+        >
+          <option value="featured">Featured</option>
+          <option value="price-asc">Price, low to high</option>
+          <option value="price-desc">Price, high to low</option>
+          <option value="alpha">Alphabetically, A–Z</option>
+        </select>
+      </div>
+      <ShopRefineCheckboxes searchParams={searchParams} pathname={pathname} />
+    </>
   );
 
   return (
@@ -131,8 +154,8 @@ export function CollectionBrowser({ collection }: Props) {
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 lg:flex-row">
-          <aside className="hidden w-56 shrink-0 lg:block">
-            <div className="sticky top-24 space-y-6">{sortControl}</div>
+          <aside className="hidden w-72 shrink-0 lg:block">
+            <div className="sticky top-24 space-y-8">{sidebarFilters}</div>
           </aside>
 
           <div className="flex-1">
@@ -145,7 +168,7 @@ export function CollectionBrowser({ collection }: Props) {
                 onClick={() => setMobileFiltersOpen(true)}
               >
                 <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Sort
+                Filters
               </Button>
             </div>
 
@@ -186,11 +209,11 @@ export function CollectionBrowser({ collection }: Props) {
       </div>
 
       <Dialog open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Sort</DialogTitle>
+            <DialogTitle>Filters</DialogTitle>
           </DialogHeader>
-          {sortControl}
+          <div className="space-y-8">{sidebarFilters}</div>
         </DialogContent>
       </Dialog>
     </div>

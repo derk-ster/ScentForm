@@ -21,6 +21,7 @@ import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { ThemeToggle } from "./ThemeToggle";
 import { AccentPaletteMenu } from "./AccentPaletteMenu";
 import { useCartFly } from "@/components/cart/CartFlyAnimationProvider";
+import { Allura7Wordmark } from "@/components/brand/Allura7Wordmark";
 
 export function SiteHeader() {
   const [solid, setSolid] = useState(false);
@@ -82,14 +83,11 @@ export function SiteHeader() {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <Link
+            <Allura7Wordmark
               href="/"
               onClick={onLogoClick}
-              className="font-display text-base tracking-[0.12em] text-foreground transition-opacity hover:opacity-80 sm:text-lg lg:text-xl"
-              aria-label="ALLURA 7 home"
-            >
-              ALLURA 7
-            </Link>
+              className="text-base sm:text-lg lg:text-xl"
+            />
           </div>
 
           <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
@@ -124,13 +122,13 @@ export function SiteHeader() {
                   variant="ghost"
                   className="gap-1 px-3 text-sm text-muted-foreground hover:text-foreground"
                 >
-                  Collections
+                  Shop lines
                   <ChevronDown className="h-3.5 w-3.5 opacity-70" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="max-h-72 w-56 overflow-y-auto">
                 <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                  Curated edits
+                  Thematic edits (not product types)
                 </DropdownMenuLabel>
                 <DropdownMenuItem asChild>
                   <Link href="/collections">View all</Link>
@@ -283,15 +281,22 @@ export function SiteHeader() {
                 </details>
                 <details className="border-b border-border/40 py-2">
                   <summary className="cursor-pointer list-none py-2 font-medium [&::-webkit-details-marker]:hidden">
-                    Collections
+                    Shop lines
                   </summary>
+                  <p className="pb-2 pl-2 text-[11px] leading-snug text-muted-foreground">
+                    Curated stories — for format filters (lotion, EDP, etc.) use{" "}
+                    <Link href="/shop" className="text-primary underline-offset-2 hover:underline">
+                      Shop
+                    </Link>
+                    .
+                  </p>
                   <div className="max-h-52 space-y-1 overflow-y-auto pb-2 pl-2">
                     <Link
                       href="/collections"
                       className="block py-1.5 text-muted-foreground"
                       onClick={() => setMobileOpen(false)}
                     >
-                      View all
+                      View all lines
                     </Link>
                     {megaCollections.map((c) => (
                       <Link

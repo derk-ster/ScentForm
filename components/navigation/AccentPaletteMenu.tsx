@@ -57,7 +57,7 @@ export function AccentPaletteMenu({ className }: { className?: string }) {
           <Palette className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
+      <DropdownMenuContent align="end" className="w-[15rem]">
         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
           Premium accent
         </DropdownMenuLabel>
@@ -71,8 +71,10 @@ export function AccentPaletteMenu({ className }: { className?: string }) {
           </DropdownMenuRadioItem>
           {ACCENT_OPTIONS.map((o) => (
             <DropdownMenuRadioItem key={o.id} value={o.id} className="text-sm">
-              <span className="font-medium">{o.label}</span>
-              <span className="block text-[10px] font-normal text-muted-foreground">
+              <span className="block font-medium leading-tight whitespace-nowrap">
+                {o.label}
+              </span>
+              <span className="mt-1 block text-[10px] font-normal leading-snug text-muted-foreground">
                 {o.hint}
               </span>
             </DropdownMenuRadioItem>
